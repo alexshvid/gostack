@@ -58,7 +58,7 @@ source creds
 10. Install Controller Node
 ./controller.py
 
-11. Copy all files to compute node(s) and install compute
+11. Copy all files to compute node(s)
 scp * username@compute-host:/home/username/
 
 12. On compute node(s) run
