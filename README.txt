@@ -12,13 +12,12 @@ How to Install Essex to Ubuntu 12.4 in 5 minutes
 2. In new VM setup networks
 eth0 = vboxif1
 eth1 = vboxif2
-eth3 = NAT
+eth2 = NAT
 
 3. Start VM and add interfaces to /etc/network/interfaces
 
 sudo nano /etc/network/interfaces
 
-### /etc/network/interfaces
   # Public network
   auto eth0
   iface eth0 inet static
