@@ -12,7 +12,7 @@ if os.geteuid() != 0:
 installer = subprocess.Popen('apt-get install -y rabbitmq-server', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
 
-change_pass = subprocess.Popen('rabbitmqctl change_password guest \'' + openstack_pass.rabbit_pass + '\'', shell=True, stdin=None, executable="/bin/bash")
+change_pass = subprocess.Popen(['rabbitmqctl', 'change_password', 'guest', openstack_pass.rabbit_pass], stdin=None)
 change_pass.wait()
 
 restarter = subprocess.Popen('service rabbitmq-server restart', shell=True, stdin=None, executable="/bin/bash")
