@@ -18,15 +18,16 @@ eth3 = NAT
 
 sudo nano /etc/network/interfaces
 
-# Public network
-auto eth0
-iface eth0 inet static
-   address  192.168.100.77
-   netmask  255.255.255.0
+### /etc/network/interfaces
+  # Public network
+  auto eth0
+  iface eth0 inet static
+     address  192.168.100.77
+     netmask  255.255.255.0
 
-# Private network
-auto eth1
-iface eth1 inet manual
+  # Private network
+  auto eth1
+  iface eth1 inet manual
 
 sudo service networking restart
 
