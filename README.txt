@@ -14,6 +14,14 @@ eth0 = vboxif1
 eth1 = vboxif2
 eth2 = NAT
 
+Split HDD to
+1Gb, /boot, ext2, primary, bootable
+2Gb, swap, logical
+2Gb, LVM, logical
+7Gb, /, ext4, logical
+
+Total 12Gb
+
 3. Start VM and add interfaces to /etc/network/interfaces
 
 sudo nano /etc/network/interfaces

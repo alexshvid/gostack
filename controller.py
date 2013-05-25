@@ -72,6 +72,8 @@ runner.wait()
 installer = subprocess.Popen('./horizon.py', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
 
+os.system('./rabbit-change-pass.sh')
+
 restarter = subprocess.Popen('cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done', shell=True, stdin=None, executable="/bin/bash")
 restarter.wait()
 
