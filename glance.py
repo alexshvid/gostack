@@ -1,23 +1,20 @@
 #!/usr/bin/python
 
-import os
-import subprocess
 import patcher
 import openstack_conf
 import openstack_pass
 import time
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
 #Create database for Glance
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE glance;'""")
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE glance;'""")
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
 
-installer = subprocess.Popen('apt-get install -y glance glance-api glance-client glance-common glance-registry python-glance', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y glance glance-api glance-client glance-common glance-registry python-glance')
 
 props = {}
 props['rabbit_password'] = ('guest', openstack_pass.rabbit_pass)
@@ -47,31 +44,23 @@ print('info: /etc/glance/glance-api-paste.ini patched ' + str(p))
 
 
 # Manage Glance
-manageRun = subprocess.Popen("glance-manage version_control 0", shell=True, stdin=None, executable="/bin/bash")
-manageRun.wait()
-print(manageRun)
+osutils.run_std("glance-manage version_control 0")
 time.sleep(2)
 
 # Sync Glance with MySQL
-glanceSync = subprocess.Popen("glance-manage db_sync", shell=True, stdin=None, executable="/bin/bash")
-glanceSync.wait()
-print(glanceSync)
+osutils.run_std("glance-manage db_sync")
 time.sleep(2)
 
 # Restart Glance
-restartGlance =  subprocess.Popen("service glance-api restart && service glance-registry restart", shell=True, stdin=None, executable="/bin/bash")
-restartGlance.wait()
-print(restartGlance)
+osutils.run_std("service glance-api restart && service glance-registry restart")
 time.sleep(2)
 
 #Download Ubuntu Precise 12.04
 if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
-  downloading = subprocess.Popen("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img", shell=True, stdin=None, executable="/bin/bash")
-  downloading.wait()
+  osutils.run_std("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img")
 
 #Import Ubuntu Cloud 12.04 to Glance
-importUb = subprocess.Popen("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img",shell=True)
-importUb.wait()
+osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
 
 
 
