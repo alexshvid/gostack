@@ -14,6 +14,7 @@ if not os.path.exists('openstack_pass.py'):
   exit('error: run ./genpass.py to generate passwords')
 
 def run(cmd):
+  print("cmd = " + cmd)
   p = subprocess.Popen(cmd, shell=True, stdin=None, stdout=subprocess.PIPE, executable="/bin/bash")
   p.wait()
   out, err = p.communicate()
@@ -124,6 +125,21 @@ def user_role_add(userId, roleId, tenantId):
   else:
     return run('keystone user-role-add --user-id=' + userId + ' --role-id=' + roleId + ' --tenant_id=' + tenantId )
 
+def service_create(name, type, desc):
+  tbl = table( run('keystone service-list') )
+  r = row(tbl, 'name', name)
+  if r != None:
+    return get(tbl, 'id', r)
+  else:
+    return keystone_id( run("keystone service-create --name {0} --type {1} --description '{2}'".format(name, type, desc) ) )
+
+def endpoint_create(region, id, publicurl, adminurl, internalurl):
+  tbl = table( run('keystone endpoint-list') )
+  r = row(tbl, 'internalurl', internalurl)
+  if r == None:
+    out = run( "keystone endpoint-create --region {0} --service-id {1} --publicurl '{2}' --adminurl '{3}' --internalurl '{4}'".format(region, id, publicurl, adminurl, internalurl) )
+    print(out)
+
 # Tenants
 adminTenantId   = tenant_create('admin')
 serviceTenantId = tenant_create('service')
@@ -158,13 +174,55 @@ user_role_add(adminUserId, adminRoleId, projectTenantId)
 user_role_add(projectUserId, memberRoleId, projectTenantId)
 
 # Configure service users/roles
-novaUserId   = user_create('nova',    openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
-glanceUserId = user_create('glance',   openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
+novaUserId    = user_create('nova',    openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
+glanceUserId  = user_create('glance',   openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
+swiftUserId   = user_create('swift',    openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
 quantumUserId = user_create('quantum', openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
 
-user_role_add(novaUserId, adminRoleId, serviceTenantId)
-user_role_add(glanceUserId, adminRoleId, serviceTenantId)
+user_role_add(novaUserId,    adminRoleId, serviceTenantId)
+user_role_add(glanceUserId,  adminRoleId, serviceTenantId)
+user_role_add(swiftUserId,   adminRoleId, serviceTenantId)
 user_role_add(quantumUserId, adminRoleId, serviceTenantId)
+
+if openstack_conf.version in ["folsom", "grizzly"]:
+  resellerRoleId = role_create('ResellerAdmin')
+  user_role_add(novaUserId, resellerRoleId, serviceTenantId)
+
+  cinderUserId = user_create('cinder', openstack_pass.openstack_pass, openstack_conf.myemail, serviceTenantId)
+  user_role_add(cinderUserId, adminRoleId, serviceTenantId)
+
+
+# Create EndPoints
+novaEndpointId = service_create('nova', 'compute', 'OpenStack Compute Service')
+url = "http://{0}:8774/v2/{1}".format(openstack_pass.pubhost, serviceTenantId)
+endpoint_create('RegionOne', novaEndpointId, url, url, url)
+
+cinderEndpointId = service_create('cinder', 'volume', 'OpenStack Volume Service')
+url = "http://{0}:8776/v1/{1}".format(openstack_pass.pubhost, serviceTenantId)
+endpoint_create('RegionOne', cinderEndpointId, url, url, url)
+
+glanceEndpointId = service_create('glance', 'image', 'OpenStack Image Service')
+url = "http://{0}:9292/v2".format(openstack_pass.pubhost)
+endpoint_create('RegionOne', glanceEndpointId, url, url, url)
+
+swiftEndpointId = service_create('swift', 'object-store', 'OpenStack Storage Service')
+url = "http://{0}:8080/v1/AUTH_{1}".format(openstack_pass.pubhost, serviceTenantId)
+adminurl = "http://{0}:8080/v1".format(openstack_pass.pubhost)
+endpoint_create('RegionOne', swiftEndpointId, url, adminurl, url)
+
+keystoneEndpointId = service_create('keystone', 'identity', 'OpenStack Identity Service')
+url = "http://{0}:5000/v2.0".format(openstack_pass.pubhost)
+adminurl = "http://{0}:35357/v2.0".format(openstack_pass.pubhost)
+endpoint_create('RegionOne', keystoneEndpointId, url, adminurl, url)
+
+ec2EndpointId = service_create('ec2', 'ec2', 'OpenStack EC2 Service')
+url = "http://{0}:8773/services/Cloud".format(openstack_pass.pubhost)
+adminurl = "http://{0}:8773/services/Admin".format(openstack_pass.pubhost)
+endpoint_create('RegionOne', ec2EndpointId, url, adminurl, url)
+
+quantumEndpointId = service_create('quantum', 'network', 'OpenStack Networking Service')
+url = "http://{0}:9696/".format(openstack_pass.pubhost)
+endpoint_create('RegionOne', quantumEndpointId, url, url, url)
 
 
 
