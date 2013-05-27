@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-version="essex"      # now supports only essex on Ubuntu 12.4
+#version="essex"      # now supports only essex on Ubuntu 12.4
+version="folsom"
 #version="grizzly"
 
 myproject="myproject"
@@ -23,4 +24,7 @@ iscsiprefix='10.10.10'
 
 root_db_pass="123"
 openstack_pass="123"
+
+verbose=True
+debug=True
 

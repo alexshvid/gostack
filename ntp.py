@@ -11,7 +11,10 @@ if os.geteuid() != 0:
 install_ntp = subprocess.Popen('apt-get install -y ntp', shell=True, stdin=None, executable="/bin/bash")
 install_ntp.wait()
 
-first_str = 'server ntp.ubuntu.com iburst\nserver 127.127.1.0\nfudge 127.127.1.0 stratum 10\n'
+first_str = """server ntp.ubuntu.com iburst
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10
+"""
 
 ntpf = open('/etc/ntp.conf','r')
 ntp_conf = ntpf.read()

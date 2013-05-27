@@ -9,7 +9,7 @@ if os.geteuid() != 0:
   exit("Login as a root")
 
 if not os.path.exists('openstack_pass.py'):
-  exit('error: run ./genpass.py firstly')
+  exit('error: run ./genpass.py to generate passwords')
 
 installer = subprocess.Popen('./ntp.py', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
@@ -20,13 +20,13 @@ installer.wait()
 installer = subprocess.Popen('./rabbit.py', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
 
+installer = subprocess.Popen('./network.py', shell=True, stdin=None, executable="/bin/bash")
+installer.wait()
+
 installer = subprocess.Popen('./keystone.py', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
 
 installer = subprocess.Popen('./glance.py', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
-
-installer = subprocess.Popen('./network.py', shell=True, stdin=None, executable="/bin/bash")
 installer.wait()
 
 installer = subprocess.Popen('./nova.py', shell=True, stdin=None, executable="/bin/bash")

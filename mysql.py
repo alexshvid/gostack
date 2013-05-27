@@ -39,7 +39,8 @@ install_python_mysql()
 
 props = {}
 props['bind-address'] = ('127.0.0.1', '0.0.0.0')
-print("info: my.cnf patched " + str(patcher.patch_file("/etc/mysql/my.cnf", props, True)))
+p = patcher.patch_file("/etc/mysql/my.cnf", props, True)
+print("info: my.cnf patched " + str(p))
 
 #Restart MySQL
 restarter = subprocess.Popen('service mysql restart', shell=True, stdin=None, executable="/bin/bash")

@@ -10,6 +10,8 @@ if os.geteuid() != 0:
 
 props={}
 props["net.ipv4.ip_forward"] = ("0", "1")
+props["net.ipv4.conf.all.rp_filter"] = (None, "0")
+props["net.ipv4.conf.default.rp_filter"] = (None, "0")
 
 p = patcher.patch_file("/etc/sysctl.conf", props)
 print("info: /etc/sysctl.conf patched " + str(p))
@@ -17,8 +19,10 @@ print("info: /etc/sysctl.conf patched " + str(p))
 apply = subprocess.Popen('sysctl net.ipv4.ip_forward=1', shell=True, stdin=None, executable="/bin/bash")
 apply.wait()
 
-installer = subprocess.Popen('apt-get install -y nova-network', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+
+if openstack_conf.version == "essex":
+  installer = subprocess.Popen('apt-get install -y nova-network', shell=True, stdin=None, executable="/bin/bash")
+  installer.wait()
 
 
 # Append eth1 to /etc/network/interface
