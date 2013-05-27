@@ -22,6 +22,7 @@ def trim_end_crln(str):
 #
 
 def patch_list(lines, props):
+  props = props.copy()
   rez = []
   patched = False
   group = ''
