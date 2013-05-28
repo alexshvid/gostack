@@ -29,7 +29,7 @@ osutils.run_std('./cinder.py')
 
 osutils.run_std('./quantum.py')
 
-osutils.run_std('apt-get install -y nova-objectstore nova-scheduler')
+osutils.run_std('./swift.py')
 
 osutils.run_std('apt-get install -y dnsmasq')
 
