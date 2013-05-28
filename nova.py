@@ -33,6 +33,24 @@ props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
 p = patcher.patch_file('/etc/nova/api-paste.ini', props, True)
 print('info: /etc/nova/api-paste.ini patched ' + str(p))
 
+# Install LibVirt
+
+osutils.run_std('apt-get install -y libvirt-bin vlan bridge-utils')
+
+osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
+
+if openstack_conf.hyperv == 'qemu':
+  print "info: setup qemu"
+  osutils.run_std('apt-get -y install nova-compute-qemu qemu')
+  osutils.run_std('apt-get -y purge dmidecode')
+
+elif openstack_conf.hyperv == 'kvm':
+  print "info: setup kvm"
+  osutils.run_std('apt-get -y install nova-compute-kvm kvm pm-utils')
+else:
+  print('error: unknown hypervisor ' + openstack_conf.hyperv)
+
+
 # Patch confs
 
 if not os.path.exists('/etc/nova/nova.conf.bak'):
@@ -52,23 +70,6 @@ if not os.path.exists('/etc/nova/nova-compute.conf.bak'):
 patcher.template_file('nova-compute.conf.' + template, '/etc/nova/nova-compute.conf')
 print('info: /etc/nova/nova-compute.conf saved')
 
-
-# Install LibVirt
-
-osutils.run_std('apt-get install -y libvirt-bin vlan bridge-utils')
-
-osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
-
-if openstack_conf.hyperv == 'qemu':
-  print "info: setup qemu"
-  osutils.run_std('apt-get -y install nova-compute-qemu qemu')
-  osutils.run_std('apt-get -y purge dmidecode')
-
-elif openstack_conf.hyperv == 'kvm':
-  print "info: setup kvm"
-  osutils.run_std('apt-get -y install nova-compute-kvm kvm pm-utils')
-else:
-  print('error: unknown hypervisor ' + openstack_conf.hyperv)
 
 
 # DB Sync
