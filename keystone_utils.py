@@ -88,5 +88,8 @@ def endpoint_create(region, id, publicurl, adminurl, internalurl):
   tbl = table( osutils.run('keystone endpoint-list') )
   r = row(tbl, 'internalurl', internalurl)
   if r == None:
-    out = osutils.run( "keystone endpoint-create --region {0} --service-id {1} --publicurl '{2}' --adminurl '{3}' --internalurl '{4}'".format(region, id, publicurl, adminurl, internalurl) )
+    if openstack_conf.version == "essex":
+      osutils.run_std( "keystone endpoint-create --region {0} --service_id {1} --publicurl '{2}' --adminurl '{3}' --internalurl '{4}'".format(region, id, publicurl, adminurl, internalurl) )
+    else:
+      osutils.run_std( "keystone endpoint-create --region {0} --service-id {1} --publicurl '{2}' --adminurl '{3}' --internalurl '{4}'".format(region, id, publicurl, adminurl, internalurl) )
 
