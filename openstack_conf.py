@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-#version="essex"      # now supports only essex on Ubuntu 12.4
-version="folsom"
+version="essex"      # now supports only essex on Ubuntu 12.4
+#version="folsom"
 #version="grizzly"
 
 myproject="myproject"
