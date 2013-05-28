@@ -25,7 +25,7 @@ osutils.run_std('./glance.py')
 
 osutils.run_std('./nova.py')
 
-osutils.run_std('./volume.py')
+osutils.run_std('./cinder.py')
 
 osutils.run_std('./quantum.py')
 
