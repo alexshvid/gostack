@@ -22,9 +22,6 @@ prvaddr='10.10.10.77'
 prvnetmask='255.255.255.0'
 iscsiprefix='10.10.10'
 
-root_db_pass="123"
-openstack_pass="123"
-
 verbose=True
 debug=True
 
