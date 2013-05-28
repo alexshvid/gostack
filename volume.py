@@ -4,30 +4,21 @@ import re
 import os
 import shutil
 import subprocess
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
 vgname = 'nova-volumes'
 
-def run_cmd(cmd):
-  p = subprocess.Popen(cmd, shell=True, stdin=None, stdout=subprocess.PIPE, executable="/bin/bash")
-  p.wait()
-  out, err = p.communicate()
-  if err != None:
-    print('error: fail run command ' + cmd + ', error code = ' + str(err))
-  return out
+osutils.run_std('apt-get install -y lvm2')
 
-installer = subprocess.Popen('apt-get install -y lvm2', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
-
-out = run_cmd('vgscan')
+out = osutils.run('vgscan')
 print(out)
 
 if not vgname in out:
 
   # Fdisk list
-  out = run_cmd('fdisk -l')
+  out = osutils.run('fdisk -l')
 
   lvm_disk = None
 
@@ -38,11 +29,9 @@ if not vgname in out:
 
   if lvm_disk != None:
     print('info: add vg ' + vgname + ' to lvm disk ' + lvm_disk)
-    out = run_cmd('vgcreate ' + vgname + ' ' + lvm_disk)
+    out = osutils.run('vgcreate ' + vgname + ' ' + lvm_disk)
     print(out)
 
-
-installer = subprocess.Popen('apt-get install -y nova-volume', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y nova-volume')
 
 

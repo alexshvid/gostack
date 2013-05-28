@@ -90,8 +90,7 @@ if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
 
 #Import Ubuntu Cloud 12.04 to Glance
 print('add ubuntu image')
-importUb = subprocess.Popen("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img",shell=True)
-importUb.wait()
+osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
 
 
 

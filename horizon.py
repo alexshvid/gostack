@@ -5,17 +5,14 @@ import os
 import shutil
 import subprocess
 import openstack_conf
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
-installer = subprocess.Popen('apt-get install -y memcached python-memcache', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y memcached python-memcache')
 
-installer = subprocess.Popen('apt-get install -y libapache2-mod-wsgi openstack-dashboard', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y libapache2-mod-wsgi openstack-dashboard')
 
-restarter = subprocess.Popen('service apache2 restart', shell=True, stdin=None, executable="/bin/bash")
-restarter.wait()
+osutils.run_std('service apache2 restart')
 
 

@@ -7,33 +7,28 @@ import patcher
 import openstack_conf
 import openstack_pass
 import shutil
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
 # Create database for Nova
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE nova;'""")
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'%' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
-os.system("""mysql -u root -p"""+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE nova;'""")
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'%' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
+osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
 
-installer = subprocess.Popen('apt-get install -y libvirt-bin vlan bridge-utils', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y libvirt-bin vlan bridge-utils')
 
-installer = subprocess.Popen('apt-get install -y tgt open-iscsi open-iscsi-utils', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
 
 # Install Nova
-installer = subprocess.Popen('apt-get install -y nova-api nova-cert nova-consoleauth nova-common nova-compute nova-doc python-nova python-novaclient', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y nova-api nova-cert nova-consoleauth nova-common nova-compute nova-doc python-nova python-novaclient')
 
 # Install VNC
-installer = subprocess.Popen('apt-get install -y nova-vncproxy', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y nova-vncproxy')
 
 # Install NOVNC
-installer = subprocess.Popen('apt-get install -y novnc', shell=True, stdin=None, executable="/bin/bash")
-installer.wait()
+osutils.run_std('apt-get install -y novnc')
 
 props = {}
 props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
@@ -44,15 +39,12 @@ print('info: /etc/nova/api-paste.ini patched ' + str(p))
 
 if openstack_conf.hyperv == 'qemu':
   print "info: setup qemu"
-  installer = subprocess.Popen('apt-get -y install nova-compute-qemu qemu', shell=True, stdin=None, executable="/bin/bash")
-  installer.wait()
-  installer = subprocess.Popen('apt-get -y purge dmidecode', shell=True, stdin=None, executable="/bin/bash")
-  installer.wait()
+  osutils.run_std('apt-get -y install nova-compute-qemu qemu')
+  osutils.run_std('apt-get -y purge dmidecode')
 
 elif openstack_conf.hyperv == 'kvm':
   print "info: setup kvm"
-  installer = subprocess.Popen('apt-get -y install nova-compute-kvm kvm pm-utils', shell=True, stdin=None, executable="/bin/bash")
-  installer.wait()
+  osutils.run_std('apt-get -y install nova-compute-kvm kvm pm-utils')
 else:
   print('error: unknown hypervisor ' + openstack_conf.hyperv)
 
@@ -72,12 +64,10 @@ patcher.template_file('nova-compute.conf.template', '/etc/nova/nova-compute.conf
 print('info: /etc/nova/nova-compute.conf saved')
 
 
-dbSync = subprocess.Popen('nova-manage db sync', shell=True, stdin=None, executable="/bin/bash")
-dbSync.wait()
+# DB Sync
+osutils.run_std('nova-manage db sync')
 
 # Restart services
-
-restarter = subprocess.Popen('cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done', shell=True, stdin=None, executable="/bin/bash")
-restarter.wait()
+osutils.run_std('cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done')
 
 

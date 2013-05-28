@@ -4,9 +4,9 @@ import os
 import subprocess
 import patcher
 import openstack_conf
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
 props={}
 props["net.ipv4.ip_forward"] = ("0", "1")
@@ -16,14 +16,7 @@ props["net.ipv4.conf.default.rp_filter"] = (None, "0")
 p = patcher.patch_file("/etc/sysctl.conf", props)
 print("info: /etc/sysctl.conf patched " + str(p))
 
-apply = subprocess.Popen('sysctl net.ipv4.ip_forward=1', shell=True, stdin=None, executable="/bin/bash")
-apply.wait()
-
-
-if openstack_conf.version == "essex":
-  installer = subprocess.Popen('apt-get install -y nova-network', shell=True, stdin=None, executable="/bin/bash")
-  installer.wait()
-
+osutils.run_std('sysctl net.ipv4.ip_forward=1')
 
 # Append eth1 to /etc/network/interface
 #
@@ -33,7 +26,6 @@ if openstack_conf.version == "essex":
 #        up ifconfig $IFACE promisc
 #
 # Restart network
-# restarter = subprocess.Popen('service networking restart', shell=True, stdin=None, executable="/bin/bash")
-# restarter.wait()
+# osutils.run_std('service networking restart')
 
 

@@ -4,10 +4,10 @@ import os
 import subprocess
 import openstack_pass
 import time
+import osutils
 from amqplib import client_0_8 as amqp
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+osutils.beroot()
 
 while 1:
 

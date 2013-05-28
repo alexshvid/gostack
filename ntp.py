@@ -1,34 +1,29 @@
 #!/usr/bin/python
 
-import re
-import os
-import shutil
-import subprocess
+import osutils
 
-if os.geteuid() != 0:
-  exit("Login as a root")
+def main():
 
-install_ntp = subprocess.Popen('apt-get install -y ntp', shell=True, stdin=None, executable="/bin/bash")
-install_ntp.wait()
+  osutils.run_std('apt-get install -y ntp')
 
-first_str = """server ntp.ubuntu.com iburst
+  first_str = """server ntp.ubuntu.com iburst
 server 127.127.1.0
 fudge 127.127.1.0 stratum 10
 """
 
-ntpf = open('/etc/ntp.conf','r')
-ntp_conf = ntpf.read()
-ntpf.close()
+  with open('/etc/ntp.conf','r') as f:
+    ntp_conf = f.read()
 
-if not ntp_conf.startswith(first_str):
+  if not ntp_conf.startswith(first_str):
 
-  ntpf = open('/etc/ntp.conf', 'w')
-  ntpf.write(first_str + ntp_conf)
-  ntpf.close()
+    with open('/etc/ntp.conf', 'w') as f:
+      f.write(first_str + ntp_conf)
 
-  print("info: added servers to ntp.conf")
+    print("info: added servers to ntp.conf")
 
-  #Restart network and ntp services
-  restart_ntp = subprocess.Popen('service ntp restart', shell=True, stdin=None, executable="/bin/bash")
-  restart_ntp.wait()
+    # Restart network and ntp services
+    osutils.run_std('service ntp restart')
 
+if __name__ == '__main__':
+  osutils.beroot()
+  main()
