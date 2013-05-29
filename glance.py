@@ -11,12 +11,12 @@ import subprocess
 osutils.beroot()
 
 #Create database for Glance
-osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE glance;'""")
-osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'%' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
-osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
-osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON glance.* TO 'glance'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.glance_db_pass+"""';" """)
+osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE glance;'" % (openstack_pass.root_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.glance_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.glance_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.glance_db_pass) )
 
-sql = "mysql://glance:"+openstack_pass.glance_db_pass+"@"+openstack_pass.pubhost+"/glance"
+sql = "mysql://glance:%s@%s:3306/glance" % (openstack_pass.glance_db_pass, openstack_pass.pubhost)
 
 if openstack_conf.version == 'essex':
   osutils.run_std('apt-get install -y glance glance-api glance-client glance-common glance-registry python-glance')
@@ -34,6 +34,7 @@ if openstack_conf.version == 'essex':
   print('info: /etc/glance/glance-registry.conf patched ' + str(p))
 
   props = {}
+  props['auth_host'] = (None, openstack_pass.pubhost)
   props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
   props['admin_user'] = ('%SERVICE_USER%', 'admin')
   props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)

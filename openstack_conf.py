@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
-version="essex"      # now supports only essex on Ubuntu 12.4
-#version="folsom"
+#version="essex"      # now supports only essex on Ubuntu 12.4
+version="folsom"
 #version="grizzly"
 
 myproject="myproject"
 myemail="my@email.com"
+mydomain='mydomain.com'
 
 pubaddr='192.168.100.77'
 dhcpstart='192.168.100.128'
@@ -24,4 +25,6 @@ iscsiprefix='10.10.10'
 
 verbose=True
 debug=True
+
+useQuantum=False
 
