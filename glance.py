@@ -34,7 +34,6 @@ if openstack_conf.version == 'essex':
   print('info: /etc/glance/glance-registry.conf patched ' + str(p))
 
   props = {}
-  props['auth_host'] = (None, openstack_pass.pubhost)
   props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
   props['admin_user'] = ('%SERVICE_USER%', 'admin')
   props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
@@ -62,6 +61,7 @@ else:
   props['sql_connection'] = ('sqlite:////var/lib/glance/glance.sqlite', sql)
   props['[paste_deploy]flavor'] = (None, 'keystone')
 
+  props['auth_host'] = ('127.0.0.1', openstack_pass.pubhost)
   props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
   props['admin_user'] = ('%SERVICE_USER%', 'admin')
   props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
@@ -90,8 +90,10 @@ if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
   osutils.run_std("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img")
 
 #Import Ubuntu Cloud 12.04 to Glance
-print('add ubuntu image')
-osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
+glanceIndex = osutils.run('glance index')
+if not 'Ubuntu-12.04' in glanceIndex:
+  print('add ubuntu image')
+  osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
 
 
 

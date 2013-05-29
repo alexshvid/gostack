@@ -22,14 +22,36 @@ osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDEN
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.nova_db_pass) )
 
+packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
+
+if openstack_conf.hyperv == 'qemu':
+  print "info: setup qemu"
+  packages = packages + ' nova-compute-qemu qemu'
+elif openstack_conf.hyperv == 'kvm':
+  print "info: setup kvm"
+  packages = packages + ' nova-compute-kvm kvm pm-utils'
+else:
+  print('error: unknown hypervisor ' + openstack_conf.hyperv)
+
 # Install Nova
-osutils.run_std('apt-get install -y nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler')
+osutils.run_std('apt-get install -y ' + packages)
+
+if openstack_conf.hyperv == 'qemu':
+  osutils.run_std('apt-get -y purge dmidecode')
 
 # Install VNC
 osutils.run_std('apt-get install -y nova-vncproxy')
 
 # Install NOVNC
 osutils.run_std('apt-get install -y novnc')
+
+
+# Install LibVirt
+osutils.run_std('apt-get install -y libvirt-bin')
+osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
+
+
+# Patch confs
 
 props = {}
 props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
@@ -38,25 +60,7 @@ props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
 p = patcher.patch_file('/etc/nova/api-paste.ini', props, True)
 print('info: /etc/nova/api-paste.ini patched ' + str(p))
 
-# Install LibVirt
-
-osutils.run_std('apt-get install -y libvirt-bin vlan bridge-utils')
-
-osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
-
-if openstack_conf.hyperv == 'qemu':
-  print "info: setup qemu"
-  osutils.run_std('apt-get -y install nova-compute-qemu qemu')
-  osutils.run_std('apt-get -y purge dmidecode')
-
-elif openstack_conf.hyperv == 'kvm':
-  print "info: setup kvm"
-  osutils.run_std('apt-get -y install nova-compute-kvm kvm pm-utils')
-else:
-  print('error: unknown hypervisor ' + openstack_conf.hyperv)
-
-
-# Patch confs
+# Templates confs
 
 if not os.path.exists('/etc/nova/nova.conf.bak'):
   shutil.copy2('/etc/nova/nova.conf', '/etc/nova/nova.conf.bak')

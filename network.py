@@ -8,6 +8,8 @@ import osutils
 
 osutils.beroot()
 
+osutils.run_std('apt-get install -y bridge-utils vlan')
+
 props={}
 props["net.ipv4.ip_forward"] = ("0", "1")
 props["net.ipv4.conf.all.rp_filter"] = (None, "0")

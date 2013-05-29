@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import os.path
+
+# both imports are used in context
 import openstack_conf
 import openstack_pass
 
@@ -132,8 +134,11 @@ def template_str(str):
       break
     rez_list.append(str[start:b])
     code = str[b+2:e]
-    v = eval(code)
-    rez_list.append(v)
+    try:
+      v = eval(code)
+      rez_list.append(v)
+    except:
+      print('error: evaluate %s in str %s' % (code, str) )
     start = e+1
   rez_list.append(str[start:])
   return ''.join(rez_list)
