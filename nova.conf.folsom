@@ -3,33 +3,50 @@
 # MySQL Connection #
 sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.pubhost+'/nova'}
 
-# nova-scheduler #
-rabbit_host=${openstack_pass.pubhost}
+# Nova Scheduler #
+rabbit_host=${openstack_conf.pubaddr}
 rabbit_password=${openstack_pass.rabbit_pass}
 scheduler_driver=nova.scheduler.simple.SimpleScheduler
 
-# nova-api #
-cc_host=${openstack_pass.pubhost}
-auth_strategy=keystone
-
-s3_host=${openstack_pass.pubhost}
-ec2_host=${openstack_pass.pubhost}
-
+# API
+cc_host=${openstack_conf.pubaddr}
+s3_host=${openstack_conf.pubaddr}
+ec2_host=${openstack_conf.pubaddr}
 nova_url=${'http://'+openstack_pass.pubhost+':8774/v1.1/'}
 ec2_url=${'http://'+openstack_pass.pubhost+':8773/services/Cloud'}
-keystone_ec2_url=${'http://'+openstack_pass.pubhost+':5000/v2.0/ec2tokens'}
-
 api_paste_config=/etc/nova/api-paste.ini
 allow_admin_api=true
-use_deprecated_auth=false
 ec2_private_dns_show_ip=True
 #dmz_cidr=169.254.169.254/32
-ec2_dmz_host=${openstack_pass.pubhost}
-metadata_host=${openstack_pass.pubhost}
+ec2_dmz_host=${openstack_conf.pubaddr}
+metadata_host=${openstack_conf.pubaddr}
 metadata_listen=0.0.0.0
 enabled_apis=ec2,osapi_compute,metadata
 
+# Auth
+use_deprecated_auth=false
+auth_strategy=keystone
+keystone_ec2_url=${'http://'+openstack_pass.pubhost+':5000/v2.0/ec2tokens'}
+
 # Networking #
+network_manager=nova.network.manager.FlatDHCPManager
+force_dhcp_release=True
+dhcpbridge=/usr/bin/nova-dhcpbridge
+firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
+my_ip=${openstack_conf.pubaddr}
+public_interface=${openstack_conf.pubint}
+flat_interface=${openstack_conf.flatint}
+flat_network_bridge=br100
+floating_range=${openstack_conf.floating}
+flat_network_dhcp_start=${openstack_conf.dhcpstart}
+flat_injected=False
+
+auto_assign_floating_ip=False
+allow_same_net_traffic=True
+multi_host=True
+network_size=250
+
+
 #network_api_class=nova.network.quantumv2.api.API
 #quantum_url=http://192.168.0.1:9696
 #quantum_auth_strategy=keystone
@@ -43,47 +60,36 @@ enabled_apis=ec2,osapi_compute,metadata
 
 # Cinder #
 #volume_api_class=nova.volume.cinder.API
+iscsi_ip_prefix=${openstack_conf.iscsiprefix}
+iscsi_ip_address=${openstack_conf.prvaddr}
+iscsi_helper=tgtadm
 
-# Glance #
+# Imaging Service #
 glance_api_servers=${openstack_pass.pubhost+':9292'}
 image_service=nova.image.glance.GlanceImageService
 
-# novnc #
+# VNC Configuration #
 novnc_enable=true
-novncproxy_base_url=${'http://'+openstack_pass.pubhost+':6080/vnc_auto.html'}
+novncproxy_base_url=${'http://'+openstack_conf.pubaddr+':6080/vnc_auto.html'}
+novncproxy_port=6080
 vncserver_proxyclient_address=127.0.0.1
 vncserver_listen=127.0.0.1
+
+# Compute #
+compute_driver=libvirt.LibvirtDriver
+libvirt_type=${openstack_conf.hyperv}
+libvirt_use_virtio_for_bridges=true
+connection_type=libvirt
+max_cores=250
 
 # Misc #
 logdir=/var/log/nova
 state_path=/var/lib/nova
 lock_path=/var/lock/nova
 root_helper=sudo nova-rootwrap /etc/nova/rootwrap.conf
-verbose=true
-
-
-dhcpbridge=/usr/bin/nova-dhcpbridge
-my_ip=${openstack_conf.pubaddr}
-iscsi_ip_prefix=${openstack_conf.iscsiprefix}
-iscsi_ip_address=${openstack_conf.prvaddr}
-libvirt_type=${openstack_conf.hyperv}
-libvirt_use_virtio_for_bridges=true
+verbose=${openstack_conf.verbose}
 start_guests_on_host_boot=true
 resume_guests_state_on_host_boot=true
-network_manager=nova.network.manager.FlatDHCPManager
-public_interface=${openstack_conf.pubint}
-flat_interface=${openstack_conf.flatint}
-flat_network_bridge=br100
-auto_assign_floating_ip=False
-network_size=250
-allow_same_net_traffic=true
-floating_range=${openstack_conf.floating}
-flat_network_dhcp_start=${openstack_conf.dhcpstart}
-flat_injected=False
-force_dhcp_release=True
-iscsi_helper=tgtadm
-connection_type=libvirt
-multi_host=True
-max_cores=250
+
 
 

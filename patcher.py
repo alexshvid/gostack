@@ -6,15 +6,15 @@ import os.path
 import openstack_conf
 import openstack_pass
 
-def trim_end_crln(str):
-  while len(str) > 0:
-    if str[-1] == '\n':
-      str = str[:-1]
-    elif str[-1] == '\r':
-      str = str[:-1]
+def trim_end_crln(s):
+  while len(s) > 0:
+    if s[-1] == '\n':
+      s = s[:-1]
+    elif s[-1] == '\r':
+      s = s[:-1]
     else:
       break
-  return str
+  return s
 
 #
 # Patch file lines
@@ -82,12 +82,12 @@ def patch_list(lines, props):
 # return Tuple(str: String, patched: Boolean)
 #
 
-def patch_str(str, props):
-  plines, patched = patch_list(str.split('\n'), props)
+def patch_str(s, props):
+  plines, patched = patch_list(s.split('\n'), props)
   if patched:
     return ('\n'.join(plines), True)
   else:
-    return (str, False)
+    return (s, False)
 
 #
 # Patch file with props
@@ -122,25 +122,28 @@ def patch_file(filename, props, mkBak=False):
 # return: String
 #
 
-def template_str(str):
+def template_str(s):
   rez_list = []
   start = 0
   while 1:
-    b = str.find('${', start)
+    b = s.find('${', start)
     if b < 0:
       break
-    e = str.find('}', b)
+    e = s.find('}', b)
     if e < 0:
       break
-    rez_list.append(str[start:b])
-    code = str[b+2:e]
+    rez_list.append(s[start:b])
+    code = s[b+2:e]
     try:
       v = eval(code)
+      if v.__class__.__name__ != 'str':
+        v = str(v)
       rez_list.append(v)
-    except:
-      print('error: evaluate %s in str %s' % (code, str) )
+    except e:
+      print(e)
+      print('error: evaluate %s in str %s' % (code, s) )
     start = e+1
-  rez_list.append(str[start:])
+  rez_list.append(s[start:])
   return ''.join(rez_list)
 
 #

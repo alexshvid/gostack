@@ -54,6 +54,7 @@ osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
 # Patch confs
 
 props = {}
+props['auth_host'] = ('127.0.0.1', openstack_pass.pubhost)
 props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
 props['admin_user'] = ('%SERVICE_USER%', 'admin')
 props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
