@@ -78,9 +78,9 @@ else:
   props['auth_strategy'] = (None, 'keystone')
   props['verbose'] = (None, openstack_conf.verbose)
   props['debug'] = (None, openstack_conf.debug)
-  props['iscsi_helper'] = ('tgtadm', 'ietadm')
-  props['state_path'] = (None, None)
-  props['volumes_dir'] = (None, None)
+  props['iscsi_helper'] = (None, 'tgtadm')
+  props['state_path'] = (None, '/var/lib/cinder')
+  props['volumes_dir'] = (None, '/var/lib/cinder/volumes')
 
   props['rabbit_host'] = (None, openstack_pass.pubhost)
   props['rabbit_port'] = (None, 5672)
