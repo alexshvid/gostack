@@ -38,8 +38,10 @@ if openstack_conf.hyperv == 'qemu':
 osutils.run_std('apt-get install -y nova-vncproxy')
 
 # Install NOVNC
-osutils.run_std('apt-get install -y novnc')
+osutils.run_std('apt-get install -y novnc nova-novncproxy')
 
+if openstack_conf.version in ['folsom', 'grizzly']:
+  osutils.run_std('apt-get install -y nova-novncproxy')
 
 # Install LibVirt
 osutils.run_std('apt-get install -y libvirt-bin')
