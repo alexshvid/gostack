@@ -24,7 +24,7 @@ if openstack_conf.hyperv == 'qemu':
   packages = packages + ' nova-compute-qemu qemu'
 elif openstack_conf.hyperv == 'kvm':
   print "info: setup kvm"
-  packages = packages + ' nova-compute-kvm kvm pm-utils'
+  packages = packages + ' nova-compute-kvm kvm'
 else:
   print('error: unknown hypervisor ' + openstack_conf.hyperv)
 
@@ -40,11 +40,10 @@ osutils.run_std('apt-get install -y nova-vncproxy')
 # Install NOVNC
 osutils.run_std('apt-get install -y novnc nova-novncproxy')
 
-if openstack_conf.version in ['folsom', 'grizzly']:
-  osutils.run_std('apt-get install -y nova-novncproxy')
-
 # Install LibVirt
-osutils.run_std('apt-get install -y libvirt-bin')
+osutils.run_std('apt-get install -y libvirt-bin pm-utils')
+
+# Install iSCSI
 osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
 
 
