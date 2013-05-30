@@ -21,18 +21,17 @@ props = {}
 props['[DEFAULT]bind_host'] = (None, '0.0.0.0')
 props['[DEFAULT]admin_token'] = ('ADMIN', openstack_pass.admin_token)
 
-props['[DEFAULT]verbose'] = (None, str(openstack_conf.verbose))
-props['[DEFAULT]debug'] = (None, str(openstack_conf.debug))
+props['[DEFAULT]verbose'] = (None, openstack_conf.verbose)
+props['[DEFAULT]debug'] = (None, openstack_conf.debug)
 
-props['[DEFAULT]public_port'] = (None, '5000')
-props['[DEFAULT]admin_port'] = (None, '35357')
-props['[DEFAULT]compute_port'] = (None, '8774')
+props['[DEFAULT]public_port'] = (None, 5000)
+props['[DEFAULT]admin_port'] = (None, 35357)
+props['[DEFAULT]compute_port'] = (None, 8774)
 
 sql = "mysql://keystone:%s@%s:3306/keystone" % (openstack_pass.keystone_db_pass, openstack_pass.pubhost)
-print("sql = " + sql)
 
 props['[sql]connection'] = ('sqlite:////var/lib/keystone/keystone.db', sql)
-props['[sql]idle_timeout'] = (None, '200')
+props['[sql]idle_timeout'] = (None, 200)
 
 if openstack_conf.version in ["folsom", "grizzly"]:
   #props['[identity]driver'] = (None, 'keystone.identity.backends.sql.Identity')

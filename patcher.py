@@ -191,3 +191,14 @@ def template_file(inf, outf):
     f.write('\n'.join(lines))
 
 
+#
+# Reads Full Text file to the string
+#
+
+def read_text_file(inf):
+  lines = []
+  with open(inf,"r") as f:
+    for line in f:
+      lines.append(trim_end_crln(line))
+  return '\n'.join(lines)
+

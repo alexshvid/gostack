@@ -76,6 +76,42 @@ patcher.template_file('nova-compute.conf.' + template, '/etc/nova/nova-compute.c
 print('info: /etc/nova/nova-compute.conf saved')
 
 
+if openstack_conf.version in ['folsom', 'grizzly']:
+
+  acl = '[ "/dev/null", "/dev/full", "/dev/zero", "/dev/random", "/dev/urandom", "/dev/ptmx", "/dev/kvm", "/dev/kqemu", "/dev/rtc", "/dev/hpet", "/dev/net/tun" ]'
+  props = {}
+  props['cgroup_device_acl'] = (None, acl)
+  p = patcher.patch_file('/etc/libvirt/qemu.conf', props, True)
+  print('info: /etc/libvirt/qemu.conf patched ' + str(p))
+
+  # Delete the default virtual bridge
+  osutils.run_std('virsh net-destroy default')
+  osutils.run_std('virsh net-undefine default')
+
+  # Setup live migration
+  props = {}
+  props['listen_tls'] = (None, 0)
+  props['listen_tcp'] = (None, 1)
+  props['auth_tcp'] = (None, '"none"')
+  p = patcher.patch_file('/etc/libvirt/libvirtd.conf', props, True)
+  print('info: /etc/libvirt/libvirtd.conf patched ' + str(p))
+
+  libvirt_bin_conf = patcher.read_text_file('/etc/init/libvirt-bin.conf')
+  libvirt_bin_conf_new = libvirt_bin_conf.replace('env libvirtd_opts="-d"', 'env libvirtd_opts="-d -l"')
+  if libvirt_bin_conf_new != libvirt_bin_conf:
+    with open('/etc/init/libvirt-bin.conf', 'w') as f:
+      f.write(libvirt_bin_conf_new)
+    print('info: /etc/init/libvirt-bin.conf patched True');
+
+  libvirt_bin = patcher.read_text_file('/etc/default/libvirt-bin')
+  libvirt_bin_new = libvirt_bin.replace('libvirtd_opts="-d"', 'libvirtd_opts="-d -l"')
+  if libvirt_bin_new != libvirt_bin:
+    with open('/etc/default/libvirt-bin', 'w') as f:
+      f.write(libvirt_bin_new)
+    print('info: /etc/default/libvirt-bin patched True');
+
+  osutils.run_std('service libvirt-bin restart')
+
 
 # DB Sync
 osutils.run_std('nova-manage db sync')

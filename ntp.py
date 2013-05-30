@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import osutils
+import patcher
 
 def main():
 
@@ -11,8 +12,7 @@ server 127.127.1.0
 fudge 127.127.1.0 stratum 10
 """
 
-  with open('/etc/ntp.conf','r') as f:
-    ntp_conf = f.read()
+  ntp_conf = patcher.read_text_file('/etc/ntp.conf')
 
   if not ntp_conf.startswith(first_str):
 
