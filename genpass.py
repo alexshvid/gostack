@@ -22,6 +22,8 @@ rabbit_pass=generate_pass(16)
 keystone_db_pass=generate_pass(16)
 glance_db_pass=generate_pass(16)
 nova_db_pass=generate_pass(16)
+cinder_db_pass=generate_pass(16)
+quantum_db_pass=generate_pass(16)
 root_db_pass=generate_pass(16)
 openstack_pass=generate_pass(16)
 
@@ -33,6 +35,8 @@ with open('openstack_pass.py', 'w') as pf:
   pf.write("keystone_db_pass='" + keystone_db_pass + "'\n")
   pf.write("glance_db_pass='" + glance_db_pass + "'\n")
   pf.write("nova_db_pass='" + nova_db_pass + "'\n")
+  pf.write("cinder_db_pass='" + cinder_db_pass + "'\n")
+  pf.write("quantum_db_pass='" + quantum_db_pass + "'\n")
   pf.write("root_db_pass='" + root_db_pass + "'\n")
   pf.write("openstack_pass='" + openstack_pass + "'\n")
 

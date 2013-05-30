@@ -12,11 +12,6 @@ import osutils
 osutils.beroot()
 
 # Create database for Nova
-#osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e 'CREATE DATABASE nova;'""")
-#osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'%' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
-#osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
-#osutils.run_std('mysql -u root -p'+openstack_pass.root_db_pass+""" -e "GRANT ALL ON nova.* TO 'nova'@'""" + openstack_pass.pubhost + """' IDENTIFIED BY '"""+openstack_pass.nova_db_pass+"""';" """)
-
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE nova;'" % (openstack_pass.root_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.nova_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )

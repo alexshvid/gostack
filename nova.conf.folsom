@@ -59,10 +59,11 @@ network_size=250
 #firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
 
 # Cinder #
-#volume_api_class=nova.volume.cinder.API
-iscsi_ip_prefix=${openstack_conf.iscsiprefix}
-iscsi_ip_address=${openstack_conf.prvaddr}
-iscsi_helper=tgtadm
+#iscsi_ip_prefix=${openstack_conf.iscsiprefix}
+#iscsi_ip_address=${openstack_conf.prvaddr}
+#iscsi_helper=tgtadm
+volume_api_class=nova.volume.cinder.API
+osapi_volume_listen_port=5900
 
 # Imaging Service #
 glance_api_servers=${openstack_pass.pubhost+':9292'}

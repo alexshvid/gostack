@@ -105,11 +105,11 @@ if openstack_conf.version in ["folsom", "grizzly"]:
 
 # Create EndPoints
 novaEndpointId = keystone_utils.service_create('nova', 'compute', 'OpenStack Compute Service')
-url = "http://%s:8774/v2/%s" % (openstack_pass.pubhost, serviceTenantId)
+url = "http://%s:8774/v2/$(tenant_id)s" % (openstack_pass.pubhost)
 keystone_utils.endpoint_create('RegionOne', novaEndpointId, url, url, url)
 
 cinderEndpointId = keystone_utils.service_create('cinder', 'volume', 'OpenStack Volume Service')
-url = "http://%s:8776/v1/%s" % (openstack_pass.pubhost, serviceTenantId)
+url = "http://%s:8776/v1/$(tenant_id)s" % (openstack_pass.pubhost)
 keystone_utils.endpoint_create('RegionOne', cinderEndpointId, url, url, url)
 
 glanceEndpointId = keystone_utils.service_create('glance', 'image', 'OpenStack Image Service')
@@ -117,7 +117,7 @@ url = "http://%s:9292/v2" % (openstack_pass.pubhost)
 keystone_utils.endpoint_create('RegionOne', glanceEndpointId, url, url, url)
 
 swiftEndpointId = keystone_utils.service_create('swift', 'object-store', 'OpenStack Storage Service')
-url = "http://%s:8080/v1/AUTH_%s" % (openstack_pass.pubhost, serviceTenantId)
+url = "http://%s:8080/v1/AUTH_%s" % (openstack_pass.pubhost, '%(tenant_id)s')
 adminurl = "http://%s:8080/v1" % (openstack_pass.pubhost)
 keystone_utils.endpoint_create('RegionOne', swiftEndpointId, url, adminurl, url)
 

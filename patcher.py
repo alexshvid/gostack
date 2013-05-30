@@ -41,14 +41,24 @@ def patch_list(lines, props):
       if props.has_key(key):
         oldv, newv = props[key]
         if (oldv == None or oldv == value) and newv != value:
-          line = key + ' = ' + newv
+          if newv == None:
+            line = '#' + line
+          else:
+            if newv.__class__.__name__ != 'str':
+              newv = str(newv)
+            line = key + ' = ' + newv
           patched = True
         del props[key]
 
       elif props.has_key(group + key):
         oldv, newv = props[group + key]
         if (oldv == None or oldv == value) and newv != value:
-          line = key + ' = ' + newv
+          if newv == None:
+            line = '#' + line
+          else:
+            if newv.__class__.__name__ != 'str':
+              newv = str(newv)
+            line = key + ' = ' + newv
           patched = True
         del props[group + key]
 
@@ -56,6 +66,11 @@ def patch_list(lines, props):
 
   for key in props:
     oldv, newv = props[key]
+    if newv == None:
+      continue
+    if newv.__class__.__name__ != 'str':
+      newv = str(newv)
+
     if len(key) > 0 and key[0] == '[' and ']' in key:
       closeb = key.index(']')
       group = key[:closeb+1]
