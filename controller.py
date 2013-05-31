@@ -31,8 +31,17 @@ osutils.run_std('./swift.py')
 
 osutils.run_std('apt-get install -y dnsmasq')
 
-if os.system('nova-manage network list') != 0:
+hasNetwork = False
+if openstack_conf.version == 'essex':
+  hasNetwork = os.system('nova-manage network list') == 0
   print('info: exception is ok')
+else:
+  out = osutils.run('nova-manage network list')
+  cidr = openstack_conf.fixedrange.split('/')[0]
+  print("cidr = " + cidr)
+  hasNetwork = cidr in out
+
+if not hasNetwork:
   print('info: network create %s on %s' % (openstack_conf.fixedrange, openstack_conf.flatint) )
   osutils.run_std('nova-manage network create private --fixed_range_v4=%s --num_networks=1 --bridge=br100 --bridge_interface=%s --network_size=250 --multi_host=T' % (openstack_conf.fixedrange, openstack_conf.flatint) )
 
@@ -54,6 +63,8 @@ osutils.run_std('nova secgroup-add-rule default tcp 22 22 0.0.0.0/0')
 osutils.run_std('./horizon.py')
 
 osutils.run_std('cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done')
+
+osutils.run_std('nova-manage network list')
 
 osutils.run_std('nova-manage service list')
 
