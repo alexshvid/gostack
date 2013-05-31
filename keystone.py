@@ -104,11 +104,11 @@ if openstack_conf.version in ["folsom", "grizzly"]:
 
 # Create EndPoints
 novaEndpointId = keystone_utils.service_create('nova', 'compute', 'OpenStack Compute Service')
-url = "http://%s:8774/v2/$(tenant_id)s" % (openstack_pass.pubhost)
+url = "http://%s:8774/v2/%s" % (openstack_pass.pubhost, '%(tenant_id)s')
 keystone_utils.endpoint_create('RegionOne', novaEndpointId, url, url, url)
 
 cinderEndpointId = keystone_utils.service_create('cinder', 'volume', 'OpenStack Volume Service')
-url = "http://%s:8776/v1/$(tenant_id)s" % (openstack_pass.pubhost)
+url = "http://%s:8776/v1/%s" % (openstack_pass.pubhost, '%(tenant_id)s')
 keystone_utils.endpoint_create('RegionOne', cinderEndpointId, url, url, url)
 
 glanceEndpointId = keystone_utils.service_create('glance', 'image', 'OpenStack Image Service')

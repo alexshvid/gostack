@@ -76,6 +76,13 @@ if not os.path.exists('/etc/nova/nova-compute.conf.bak'):
 patcher.template_file('nova-compute.conf.' + template, '/etc/nova/nova-compute.conf')
 print('info: /etc/nova/nova-compute.conf saved')
 
+# Patch sudoers file
+sudoers = patcher.read_text_file('/etc/sudoers')
+novaAll = 'nova ALL=(ALL) NOPASSWD:ALL'
+if not novaAll in sudoers:
+  with open('/etc/sudoers', 'w') as f:
+    f.write(sudoers + '\n' + novaAll + '\n')
+  print('info: file /etc/sudoers patched True')
 
 if openstack_conf.version in ['folsom', 'grizzly']:
 
