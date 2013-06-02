@@ -62,18 +62,13 @@ print('info: /etc/nova/api-paste.ini patched ' + str(p))
 if not os.path.exists('/etc/nova/nova.conf.bak'):
   shutil.copy2('/etc/nova/nova.conf', '/etc/nova/nova.conf.bak')
 
-if openstack_conf.version == 'essex':
-  template = 'essex'
-else:
-  template = 'folsom'
-
-patcher.template_file('nova.conf.' + template, '/etc/nova/nova.conf')
+patcher.template_file('nova.conf.' + openstack_conf.version, '/etc/nova/nova.conf')
 print('info: /etc/nova/nova.conf saved')
 
 if not os.path.exists('/etc/nova/nova-compute.conf.bak'):
   shutil.copy2('/etc/nova/nova-compute.conf', '/etc/nova/nova-compute.conf.bak')
 
-patcher.template_file('nova-compute.conf.' + template, '/etc/nova/nova-compute.conf')
+patcher.template_file('nova-compute.conf.' + openstack_conf.version, '/etc/nova/nova-compute.conf')
 print('info: /etc/nova/nova-compute.conf saved')
 
 # Patch sudoers file

@@ -14,6 +14,8 @@ osutils.run_std('apt-get install -y memcached python-memcache')
 
 osutils.run_std('apt-get install -y libapache2-mod-wsgi openstack-dashboard')
 
+# osutils.run_std('dpkg --purge openstack-dashboard-ubuntu-theme')
+
 osutils.run_std('service apache2 restart')
 
 

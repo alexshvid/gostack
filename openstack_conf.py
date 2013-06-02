@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 #version="essex"      # now supports only essex on Ubuntu 12.4
-version="folsom"
-#version="grizzly"
+#version="folsom"
+version="grizzly"
 
 myproject="myproject"
 myemail="my@email.com"
@@ -28,3 +28,5 @@ debug=True
 
 useQuantum=False
 
+if version == 'grizzly':
+  useQuantum=True
