@@ -24,7 +24,7 @@ def row(tbl, col, key):
   return None
 
 def get(tbl, col, row):
-  if col in tbl[0]:
+  if len(tbl) > 0 and col in tbl[0]:
     c = tbl[0].index(col)
     return row[c]
   return None

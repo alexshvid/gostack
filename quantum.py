@@ -66,8 +66,8 @@ print('info: /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini patched ' +
 props = {}
 props['auth_url'] = (None, 'http://%s:35357/v2.0' % (openstack_pass.pubhost))
 props['auth_region'] = (None, 'RegionOne')
-props['admin_tenant_name'] = (None, 'service')
-props['admin_user'] = (None, 'quantum')
+props['admin_tenant_name'] = (None, 'admin')
+props['admin_user'] = (None, 'admin')
 props['admin_password'] = (None, openstack_pass.openstack_pass)
 props['nova_metadata_ip'] = (None, openstack_conf.prvaddr)
 props['nova_metadata_port'] = (None, 8775)
@@ -82,8 +82,8 @@ props['[DEFAULT]verbose'] = (None, openstack_conf.verbose)
 props['[keystone_authtoken]auth_host'] = (None, openstack_conf.prvaddr)
 props['[keystone_authtoken]auth_port'] = (None, 35357)
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
-props['[keystone_authtoken]admin_tenant_name'] = (None, 'service')
-props['[keystone_authtoken]admin_user'] = (None, 'quantum')
+props['[keystone_authtoken]admin_tenant_name'] = (None, 'admin')
+props['[keystone_authtoken]admin_user'] = (None, 'admin')
 props['[keystone_authtoken]admin_password'] = (None, openstack_pass.openstack_pass)
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
 props['[keystone_authtoken]signing_dir'] = (None, '/var/lib/quantum/keystone-signing')
@@ -100,12 +100,85 @@ print('info: /etc/quantum/quantum.conf patched ' + str(p))
 osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done')
 osutils.run_std('service dnsmasq restart')
 
+def quantum_id(out):
+  tbl = keystone_utils.table(out)
+  return keystone_utils.get(tbl, 'Value', keystone_utils.row(tbl, 'Field', 'id'))
+
+def quantum_net_create(tenantId, netName):
+  tbl = keystone_utils.table( osutils.run('quantum net-list') )
+  r = keystone_utils.row(tbl, 'name', netName)
+  if r != None:
+    return keystone_utils.get(tbl, 'id', r)
+  return quantum_id( osutils.run('quantum net-create --tenant-id %s %s' % (tenantId, netName)) )
+
+def quantum_subnet_create(tenantId, netName, cidr):
+  tbl = keystone_utils.table (osutils.run('quantum subnet-list') )
+  r = keystone_utils.row(tbl, 'cidr', cidr)
+  if r != None:
+    return keystone_utils.get(tbl, 'id', r)
+  return quantum_id( osutils.run('quantum subnet-create --tenant-id %s %s %s' % (tenantId, netName, cidr)) )
+
+def quantum_router_create(tenantId, routerName):
+  tbl = keystone_utils.table (osutils.run('quantum router-list') )
+  r = keystone_utils.row(tbl, 'router', routerName)
+  if r != None:
+    return keystone_utils.get(tbl, 'id', r)
+  return quantum_id( osutils.run('quantum router-create --tenant-id %s %s' % (tenantId, routerName) ))
+
+def quantum_agent_find(agentName):
+  tbl = keystone_utils.table (osutils.run('quantum agent-list') )
+  print(tbl)
+  r = keystone_utils.row(tbl, 'agent_type', agentName)
+  if r != None:
+    return keystone_utils.get(tbl, 'id', r)
+  return None
+
 # Add networks for Tenants
 adminTenantId = keystone_utils.tenant_find('admin')
 if adminTenantId != None:
+
   print('info: setup network for admin tenant')
 
+  netId = quantum_net_create(adminTenantId, 'net_admin')
+  print("admin netId = %s" % (netId))
+  subNetId = quantum_subnet_create(adminTenantId, 'net_admin', openstack_conf.quantumAdminSubNet)
+  print("admin subNetId = %s" % (subNetId))
+  routerId = quantum_router_create(adminTenantId, 'router_admin')
+  print("admin routerId = %s" % (routerId))
+
+  # Add the router to the subnet
+  osutils.run_std('quantum router-interface-add %s %s' % (routerId, subNetId))
 
 projectTenantId = keystone_utils.tenant_find(openstack_conf.myproject)
 if projectTenantId != None:
   print('info: setup network for %s tenant' % (openstack_conf.myproject))
+
+  netName = 'net_' + openstack_conf.myproject
+  routerName = 'router_' + openstack_conf.myproject
+
+  netId = quantum_net_create(projectTenantId, netName)
+  print("project netId = %s" % (netId))
+  subNetId = quantum_subnet_create(projectTenantId, netName, openstack_conf.quantumProjectSubNet)
+  print("project subNetId = %s" % (subNetId))
+  routerId = quantum_router_create(projectTenantId, routerName)
+  print("project routerId = %s" % (routerId))
+
+  # Add the router to the subnet
+  osutils.run_std('quantum router-interface-add %s %s' % (routerId, subNetId))
+
+
+# Add Routers to L3 Agent
+l3AgentId = quantum_agent_find('L3 agent')
+print("l3AgentId = %s" % (l3AgentId))
+if l3AgentId != None:
+  osutils.run_std('quantum l3-agent-router-add %s router_admin' % (l3AgentId))
+  osutils.run_std('quantum l3-agent-router-add %s router_%s' % (l3AgentId, openstack_conf.myproject))
+else:
+  print('error: L3 Agent not found')
+
+
+# Restart Quantum
+osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done')
+
+
+

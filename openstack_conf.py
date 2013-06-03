@@ -27,6 +27,8 @@ verbose=True
 debug=True
 
 useQuantum=False
+quantumAdminSubNet='100.10.10.0/24'
+quantumProjectSubNet='100.100.100.0/24'
 
 if version == 'grizzly':
   useQuantum=True
