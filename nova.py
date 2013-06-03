@@ -19,6 +19,9 @@ osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDEN
 
 packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
 
+if openstack_conf.version == 'grizzly':
+  packages = packages + ' nova-conductor'
+
 if openstack_conf.hyperv == 'qemu':
   print "info: setup qemu"
   packages = packages + ' nova-compute-qemu qemu'
