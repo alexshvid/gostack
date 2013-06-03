@@ -120,7 +120,7 @@ def quantum_subnet_create(tenantId, netName, cidr):
 
 def quantum_router_create(tenantId, routerName):
   tbl = keystone_utils.table (osutils.run('quantum router-list') )
-  r = keystone_utils.row(tbl, 'router', routerName)
+  r = keystone_utils.row(tbl, 'name', routerName)
   if r != None:
     return keystone_utils.get(tbl, 'id', r)
   return quantum_id( osutils.run('quantum router-create --tenant-id %s %s' % (tenantId, routerName) ))
