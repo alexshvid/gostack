@@ -51,6 +51,13 @@ def tenant_create(name):
   else:
     return keystone_id( osutils.run('keystone tenant-create --name=' + name) )
 
+def tenant_find(name):
+  tbl = table( osutils.run('keystone tenant-list') )
+  r = row(tbl, 'name', name)
+  if r != None:
+    return get(tbl, 'id', r)
+  return None
+
 def user_create(name, pwd, email, tenantId=None):
   tbl = table( osutils.run('keystone user-list') )
   r = row(tbl, 'name', name)

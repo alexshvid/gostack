@@ -6,7 +6,7 @@ sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.
 # Nova Scheduler #
 rabbit_host=${openstack_conf.pubaddr}
 rabbit_password=${openstack_pass.rabbit_pass}
-scheduler_driver=nova.scheduler.simple.SimpleScheduler
+compute_scheduler_driver=nova.scheduler.simple.SimpleScheduler
 #scheduler_driver=nova.scheduler.multi.MultiScheduler
 #compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
 

@@ -6,6 +6,7 @@ import patcher
 import openstack_conf
 import openstack_pass
 import osutils
+import keystone_utils
 
 osutils.beroot()
 
@@ -25,9 +26,9 @@ osutils.run_std('apt-get install -y quantum-server quantum-plugin-openvswitch qu
 
 # Create database for Quantum
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE quantum;'" % (openstack_pass.root_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.quantum_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.quantum_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.quantum_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.quantum_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.quantum_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.quantum_db_pass) )
 
 # Restart Quantum
 osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done')
@@ -86,6 +87,11 @@ props['[keystone_authtoken]admin_user'] = (None, 'quantum')
 props['[keystone_authtoken]admin_password'] = (None, openstack_pass.openstack_pass)
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
 props['[keystone_authtoken]signing_dir'] = (None, '/var/lib/quantum/keystone-signing')
+
+props['[DEFAULT]rabbit_host'] = (None, openstack_pass.pubhost)
+props['[DEFAULT]rabbit_userid'] = (None, 'guest')
+props['[DEFAULT]rabbit_password'] = ('guest', openstack_pass.rabbit_pass)
+
 p = patcher.patch_file('/etc/quantum/quantum.conf', props, True)
 print('info: /etc/quantum/quantum.conf patched ' + str(p))
 
@@ -94,4 +100,12 @@ print('info: /etc/quantum/quantum.conf patched ' + str(p))
 osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done')
 osutils.run_std('service dnsmasq restart')
 
+# Add networks for Tenants
+adminTenantId = keystone_utils.tenant_find('admin')
+if adminTenantId != None:
+  print('info: setup network for admin tenant')
 
+
+projectTenantId = keystone_utils.tenant_find(openstack_conf.myproject)
+if projectTenantId != None:
+  print('info: setup network for %s tenant' % (openstack_conf.myproject))
