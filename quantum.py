@@ -71,7 +71,7 @@ props['admin_user'] = (None, 'admin')
 props['admin_password'] = (None, openstack_pass.openstack_pass)
 props['nova_metadata_ip'] = (None, openstack_conf.prvaddr)
 props['nova_metadata_port'] = (None, 8775)
-props['metadata_proxy_shared_secret'] = (None, 'helloOpenStack')
+props['metadata_proxy_shared_secret'] = (None, openstack_pass.quantum_metadata_proxy_shared_secret)
 p = patcher.patch_file('/etc/quantum/metadata_agent.ini', props, True)
 print('info: /etc/quantum/metadata_agent.ini patched ' + str(p))
 

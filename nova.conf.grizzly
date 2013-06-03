@@ -25,7 +25,7 @@ enabled_apis=ec2,osapi_compute,metadata
 
 #Metadata
 service_quantum_metadata_proxy = True
-quantum_metadata_proxy_shared_secret = helloOpenStack
+quantum_metadata_proxy_shared_secret = ${openstack_pass.quantum_metadata_proxy_shared_secret}
 metadata_host = ${openstack_conf.prvaddr}
 metadata_listen = 127.0.0.1
 metadata_listen_port = 8775
