@@ -15,14 +15,30 @@ if not openstack_conf.useQuantum:
 
 osutils.run_std('apt-get install -y openvswitch-switch openvswitch-datapath-dkms')
 
-# br-int will be used for VM integration
-osutils.run_std('ovs-vsctl add-br br-int')
+listBr = osutils.run('ovs-vsctl list-br')
 
-# br-ex is used to make to access the internet (not covered in this guide)
-osutils.run_std('ovs-vsctl add-br br-ex')
+if not 'br-int' in listBr:
+  # br-int will be used for VM integration
+  print('info: add-br br-int')
+  osutils.run_std('ovs-vsctl add-br br-int')
+
+if not 'br-ex' in listBr:
+  # br-ex is used to make to access the internet (not covered in this guide)
+  print('info: add-br br-ex')
+  osutils.run_std('ovs-vsctl add-br br-ex')
+  osutils.run_std('ovs-vsctl add-port br-ex ' + openstack_conf.flatint)
+
 
 # Install the Quantum components:
 osutils.run_std('apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent')
+
+# Patch sudoers file
+sudoers = patcher.read_text_file('/etc/sudoers')
+quantumAll = 'quantum ALL=(ALL) NOPASSWD:ALL'
+if not quantumAll in sudoers:
+  with open('/etc/sudoers', 'w') as f:
+    f.write(sudoers + '\n' + quantumAll + '\n')
+  print('info: file /etc/sudoers patched True')
 
 # Create database for Quantum
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE quantum;'" % (openstack_pass.root_db_pass) )
