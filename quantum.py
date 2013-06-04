@@ -16,17 +16,23 @@ if not openstack_conf.useQuantum:
 osutils.run_std('apt-get install -y openvswitch-switch openvswitch-datapath-dkms')
 
 listBr = osutils.run('ovs-vsctl list-br')
-
 if not 'br-int' in listBr:
-  # br-int will be used for VM integration
   print('info: add-br br-int')
   osutils.run_std('ovs-vsctl add-br br-int')
 
 if not 'br-ex' in listBr:
-  # br-ex is used to make to access the internet (not covered in this guide)
   print('info: add-br br-ex')
   osutils.run_std('ovs-vsctl add-br br-ex')
-  osutils.run_std('ovs-vsctl add-port br-ex ' + openstack_conf.flatint)
+
+listBr = osutils.run('ovs-vsctl list-ports br-int')
+if not openstack_conf.quantumIntInt in listBr:
+  print('info: add-port br-int ' + openstack_conf.quantumIntInt)
+  osutils.run_std('ovs-vsctl add-port br-int ' + openstack_conf.quantumIntInt)
+
+listBr = osutils.run('ovs-vsctl list-ports br-ex')
+if not openstack_conf.quantumExtInt in listBr:
+  print('info: add-port br-ex ' + openstack_conf.quantumExtInt)
+  osutils.run_std('ovs-vsctl add-port br-ex ' + openstack_conf.quantumExtInt)
 
 
 # Install the Quantum components:
@@ -72,7 +78,7 @@ props['[OVS]tenant_network_type'] = (None, 'gre')
 props['[OVS]tunnel_id_ranges'] = (None, '1:1000')
 props['[OVS]integration_bridge'] = (None, 'br-int')
 props['[OVS]tunnel_bridge'] = (None, 'br-tun')
-props['[OVS]local_ip'] = (None, openstack_conf.prvaddr)
+props['[OVS]local_ip'] = (None, openstack_conf.pubaddr)
 props['[OVS]enable_tunneling'] = (None, True)
 props['[SECURITYGROUP]firewall_driver'] = (None, 'quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver')
 p = patcher.patch_file('/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini', props, True)
@@ -85,7 +91,7 @@ props['auth_region'] = (None, 'RegionOne')
 props['admin_tenant_name'] = (None, 'admin')
 props['admin_user'] = (None, 'admin')
 props['admin_password'] = (None, openstack_pass.openstack_pass)
-props['nova_metadata_ip'] = (None, openstack_conf.prvaddr)
+props['nova_metadata_ip'] = (None, openstack_conf.pubaddr)
 props['nova_metadata_port'] = (None, 8775)
 props['metadata_proxy_shared_secret'] = (None, openstack_pass.quantum_metadata_proxy_shared_secret)
 p = patcher.patch_file('/etc/quantum/metadata_agent.ini', props, True)
@@ -95,7 +101,7 @@ print('info: /etc/quantum/metadata_agent.ini patched ' + str(p))
 props = {}
 props['[DEFAULT]debug'] = (None, openstack_conf.debug)
 props['[DEFAULT]verbose'] = (None, openstack_conf.verbose)
-props['[keystone_authtoken]auth_host'] = (None, openstack_conf.prvaddr)
+props['[keystone_authtoken]auth_host'] = (None, openstack_pass.pubhost)
 props['[keystone_authtoken]auth_port'] = (None, 35357)
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
 props['[keystone_authtoken]admin_tenant_name'] = (None, 'admin')
@@ -120,19 +126,22 @@ def quantum_id(out):
   tbl = keystone_utils.table(out)
   return keystone_utils.get(tbl, 'Value', keystone_utils.row(tbl, 'Field', 'id'))
 
-def quantum_net_create(tenantId, netName):
+def quantum_net_create(tenantId, netName, external=False):
   tbl = keystone_utils.table( osutils.run('quantum net-list') )
   r = keystone_utils.row(tbl, 'name', netName)
   if r != None:
     return keystone_utils.get(tbl, 'id', r)
-  return quantum_id( osutils.run('quantum net-create --tenant-id %s %s' % (tenantId, netName)) )
+  cmd = 'quantum net-create --tenant-id %s %s'
+  if external:
+    cmd = cmd + ' --router:external=True'
+  return quantum_id( osutils.run(cmd % (tenantId, netName)) )
 
-def quantum_subnet_create(tenantId, netName, cidr):
+def quantum_subnet_create(tenantId, netName, cidr, opts=''):
   tbl = keystone_utils.table (osutils.run('quantum subnet-list') )
   r = keystone_utils.row(tbl, 'cidr', cidr)
   if r != None:
     return keystone_utils.get(tbl, 'id', r)
-  return quantum_id( osutils.run('quantum subnet-create --tenant-id %s %s %s' % (tenantId, netName, cidr)) )
+  return quantum_id( osutils.run('quantum subnet-create --tenant-id %s %s %s %s' % (tenantId, opts, netName, cidr)) )
 
 def quantum_router_create(tenantId, routerName):
   tbl = keystone_utils.table (osutils.run('quantum router-list') )
@@ -155,29 +164,30 @@ if adminTenantId != None:
 
   print('info: setup network for admin tenant')
 
-  netId = quantum_net_create(adminTenantId, 'net_admin')
-  print("admin netId = %s" % (netId))
-  subNetId = quantum_subnet_create(adminTenantId, 'net_admin', openstack_conf.quantumAdminSubNet)
-  print("admin subNetId = %s" % (subNetId))
-  routerId = quantum_router_create(adminTenantId, 'router_admin')
-  print("admin routerId = %s" % (routerId))
+  netId = quantum_net_create(adminTenantId, 'net_ext', True)
+  print("ext netId = %s" % (netId))
 
-  # Add the router to the subnet
-  osutils.run_std('quantum router-interface-add %s %s' % (routerId, subNetId))
+  opts = '--allocation-pool start=%s,end=%s --enable_dhcp=False --gateway %s' % (openstack_conf.quantumFloatingStart, openstack_conf.quantumFloatingEnd, openstack_conf.quantumFloatingGateway)
+  subNetId = quantum_subnet_create(adminTenantId, 'net_ext', openstack_conf.quantumFloating, opts)
+  print("ext subNetId = %s" % (subNetId))
+
+  routerId = quantum_router_create(adminTenantId, 'router_ext')
+  print("ext routerId = %s" % (routerId))
+
+  osutils.run_std('quantum router-gateway-set %s %s' % (routerId, netId))
+
 
 projectTenantId = keystone_utils.tenant_find(openstack_conf.myproject)
 if projectTenantId != None:
   print('info: setup network for %s tenant' % (openstack_conf.myproject))
 
   netName = 'net_' + openstack_conf.myproject
-  routerName = 'router_' + openstack_conf.myproject
 
   netId = quantum_net_create(projectTenantId, netName)
   print("project netId = %s" % (netId))
+
   subNetId = quantum_subnet_create(projectTenantId, netName, openstack_conf.quantumProjectSubNet)
   print("project subNetId = %s" % (subNetId))
-  routerId = quantum_router_create(projectTenantId, routerName)
-  print("project routerId = %s" % (routerId))
 
   # Add the router to the subnet
   osutils.run_std('quantum router-interface-add %s %s' % (routerId, subNetId))
@@ -187,8 +197,7 @@ if projectTenantId != None:
 l3AgentId = quantum_agent_find('L3 agent')
 print("l3AgentId = %s" % (l3AgentId))
 if l3AgentId != None:
-  osutils.run_std('quantum l3-agent-router-add %s router_admin' % (l3AgentId))
-  osutils.run_std('quantum l3-agent-router-add %s router_%s' % (l3AgentId, openstack_conf.myproject))
+  osutils.run_std('quantum l3-agent-router-add %s router_ext' % (l3AgentId))
 else:
   print('error: L3 Agent not found')
 
