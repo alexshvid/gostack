@@ -31,9 +31,7 @@ osutils.run_std('./swift.py')
 
 osutils.run_std('apt-get install -y dnsmasq')
 
-if openstack_conf.useQuantum:
-  pass
-else:
+if not openstack_conf.useQuantum:
   hasNetwork = False
   if openstack_conf.version == 'essex':
     hasNetwork = os.system('nova-manage network list') == 0

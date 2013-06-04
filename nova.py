@@ -74,6 +74,46 @@ if not os.path.exists('/etc/nova/nova-compute.conf.bak'):
 patcher.template_file('nova-compute.conf.' + openstack_conf.version, '/etc/nova/nova-compute.conf')
 print('info: /etc/nova/nova-compute.conf saved')
 
+# Setup Networks
+if openstack_conf.version == 'grizzly':
+  if openstack_conf.useQuantum:
+
+    props = {}
+    props['network_api_class'] = (None, 'nova.network.quantumv2.api.API')
+    props['quantum_url'] = (None, 'http://'+openstack_pass.pubhost+':9696')
+    props['quantum_auth_strategy'] = (None, 'keystone')
+    props['quantum_admin_tenant_name'] = (None, 'service')
+    props['quantum_admin_username'] = (None, 'quantum')
+    props['quantum_admin_password'] = (None, openstack_pass.openstack_pass)
+    props['quantum_admin_auth_url'] = (None, 'http://'+openstack_pass.pubhost+':35357/v2.0')
+    props['libvirt_vif_driver'] = (None, 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver')
+    props['linuxnet_interface_driver'] = (None, 'nova.network.linux_net.LinuxOVSInterfaceDriver')
+    props['firewall_driver'] = (None, 'nova.virt.libvirt.firewall.IptablesFirewallDriver')
+
+    p = patcher.patch_file('/etc/nova/nova.conf', props, True)
+    print('info: /etc/nova/nova.conf patched for quantum ' + str(p))
+
+  else:
+
+    props = {}
+    props['network_manager'] = (None, 'nova.network.manager.FlatDHCPManager')
+    props['force_dhcp_release'] = (None, True)
+    props['dhcpbridge'] = (None, '/usr/bin/nova-dhcpbridge')
+    props['dhcpbridge_flagfile'] = (None, '/etc/nova/nova.conf')
+    props['firewall_driver'] = (None, 'nova.virt.libvirt.firewall.IptablesFirewallDriver')
+    props['my_ip'] = (None, openstack_conf.pubaddr)
+    props['public_interface'] = (None, openstack_conf.pubint)
+    props['flat_interface'] = (None, openstack_conf.flatint)
+    props['flat_network_bridge'] = (None, 'br100')
+    props['floating_range'] = (None, openstack_conf.floating)
+    props['flat_network_dhcp_start'] = (None, openstack_conf.dhcpstart)
+    props['flat_injected'] = (None, False)
+    props['connection_type'] = (None, 'libvirt')
+
+    p = patcher.patch_file('/etc/nova/nova.conf', props, True)
+    print('info: /etc/nova/nova.conf patched for nova-network ' + str(p))
+
+
 # Patch sudoers file
 sudoers = patcher.read_text_file('/etc/sudoers')
 novaAll = 'nova ALL=(ALL) NOPASSWD:ALL'
