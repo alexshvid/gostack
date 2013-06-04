@@ -98,6 +98,14 @@ props['metadata_proxy_shared_secret'] = (None, openstack_pass.quantum_metadata_p
 p = patcher.patch_file('/etc/quantum/metadata_agent.ini', props, True)
 print('info: /etc/quantum/metadata_agent.ini patched ' + str(p))
 
+# Update /etc/quantum/dhcp_agent.ini
+props = {}
+props['[DEFAULT]debug'] = (None, openstack_conf.debug)
+props['[DEFAULT]use_namespaces'] = (None, openstack_conf.use_namespaces)
+p = patcher.patch_file('/etc/quantum/dhcp_agent.ini', props, True)
+print('info: /etc/quantum/dhcp_agent.ini patched ' + str(p))
+
+
 # Edit your /etc/quantum/quantum.conf
 props = {}
 props['[DEFAULT]debug'] = (None, openstack_conf.debug)
@@ -177,6 +185,13 @@ if adminTenantId != None:
 
   osutils.run_std('quantum router-gateway-set %s %s' % (routerId, netId))
 
+  props = {}
+  props['use_namespaces'] = (None, openstack_conf.use_namespaces)
+  props['gateway_external_net_id'] = (None, netId)
+  props['router_id'] = (None, routerId)
+  p = patcher.patch_file('/etc/quantum/l3_agent.ini', props, True)
+  print('info: /etc/quantum/l3_agent.ini patched ' + str(p))
+
 
 projectTenantId = keystone_utils.tenant_find(openstack_conf.myproject)
 if projectTenantId != None:
@@ -201,7 +216,6 @@ if l3AgentId != None:
   osutils.run_std('quantum l3-agent-router-add %s router_ext' % (l3AgentId))
 else:
   print('error: L3 Agent not found')
-
 
 # Restart Quantum
 osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i restart; done')

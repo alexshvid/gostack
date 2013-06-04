@@ -34,6 +34,7 @@ quantumFloating='192.168.56.0/24'
 quantumFloatingStart='192.168.56.2'
 quantumFloatingEnd='192.168.56.254'
 quantumFloatingGateway='192.168.56.1'
+use_namespaces=False
 
 if version == 'grizzly':
   useQuantum=True
