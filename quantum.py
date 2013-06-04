@@ -23,6 +23,7 @@ if not 'br-int' in listBr:
 if not 'br-ex' in listBr:
   print('info: add-br br-ex')
   osutils.run_std('ovs-vsctl add-br br-ex')
+  osutils.run_std('ovs-vsctl br-set-external-id br-ex bridge-id br-ex')
 
 listBr = osutils.run('ovs-vsctl list-ports br-int')
 if not openstack_conf.quantumIntInt in listBr:
