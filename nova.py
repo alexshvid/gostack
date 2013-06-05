@@ -112,6 +112,7 @@ if openstack_conf.version == 'grizzly':
     props['flat_network_dhcp_start'] = (None, openstack_conf.flat_dhcpstart)
     props['flat_injected'] = (None, False)
     props['connection_type'] = (None, 'libvirt')
+    props['fixed_range'] = (None, "''")
 
     p = patcher.patch_file('/etc/nova/nova.conf', props, True)
     print('info: /etc/nova/nova.conf patched for nova-network ' + str(p))
