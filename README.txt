@@ -49,27 +49,20 @@ sudo apt-get install git
 git clone git://github.com/shvid/gostack.git
 cd gostack
 
-6. Make all Python files executable
-chmod +x *.py
+6. Change configuration/settings if need
 
-7. Change configuration if need
 nano openstack_conf.py
 
-8. Generate passwords
+a) change my_ip for controller or compute
+b) change version of the openstack
+c) change aptupdate to True for non-updated system
+
+7. Generate passwords
 ./genpass.py
 sudo bash
 source creds
 
-9. Update system if need
-./aptupdate.py
+8. Install OpenStack
+./install.py
 
-10. Install Controller Node
-./controller.py
-
-11. Copy all files to compute node(s)
-scp * username@compute-host:/home/username/
-
-12. On compute node(s) run
-./compute.py
-
-13. Done
+Done.
