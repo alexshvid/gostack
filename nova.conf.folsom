@@ -36,12 +36,12 @@ force_dhcp_release=True
 dhcpbridge=/usr/bin/nova-dhcpbridge
 dhcpbridge_flagfile=/etc/nova/nova.conf
 firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
-my_ip=${openstack_conf.pubaddr}
+my_ip=${openstack_conf.my_ip}
 public_interface=${openstack_conf.pubint}
 flat_interface=${openstack_conf.flatint}
 flat_network_bridge=br100
 floating_range=${openstack_conf.floating}
-flat_network_dhcp_start=${openstack_conf.dhcpstart}
+flat_network_dhcp_start=${openstack_conf.flat_dhcpstart}
 flat_injected=False
 connection_type=libvirt
 
