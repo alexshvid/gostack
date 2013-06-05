@@ -38,19 +38,19 @@ if not openstack_conf.useQuantum:
     print('info: exception is ok')
   else:
     out = osutils.run('nova-manage network list')
-    cidr = openstack_conf.fixedrange.split('/')[0]
+    cidr = openstack_conf.fixed_range.split('/')[0]
     print("cidr = " + cidr)
     hasNetwork = cidr in out
 
   if not hasNetwork:
-    print('info: network create %s on %s' % (openstack_conf.fixedrange, openstack_conf.flatint) )
-    osutils.run_std('nova-manage network create private --fixed_range_v4=%s --num_networks=1 --bridge=br100 --bridge_interface=%s --network_size=250 --multi_host=T' % (openstack_conf.fixedrange, openstack_conf.flatint) )
+    print('info: network create %s on %s' % (openstack_conf.fixed_range, openstack_conf.flatint) )
+    osutils.run_std('nova-manage network create private --fixed_range_v4=%s --num_networks=1 --bridge=br100 --bridge_interface=%s --network_size=250 --multi_host=T' % (openstack_conf.fixed_range, openstack_conf.flatint) )
 
   floatingOut = osutils.run('nova-manage floating list')
 
   if floatingOut.find('No floating') >= 0:
-    print("info: floating create " + openstack_conf.floating)
-    osutils.run_std('nova-manage floating create --ip_range=%s' % (openstack_conf.floating) )
+    print("info: floating create " + openstack_conf.floating_range)
+    osutils.run_std('nova-manage floating create --ip_range=%s' % (openstack_conf.floating_range) )
 
 osutils.run_std('nova keypair-add ssh_key > ssh_key.pem')
 

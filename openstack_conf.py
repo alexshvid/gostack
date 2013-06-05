@@ -14,11 +14,11 @@ mydomain='mydomain.com'
 pubint='eth0'
 pubaddr='192.168.100.77'
 my_ip='192.168.100.77'
-floating='192.168.100.128/25'
+floating_range='192.168.100.128/25'
 
 flatint='eth1'
 flat_dhcpstart='10.10.10.2'
-fixedrange='10.10.10.0/23'
+fixed_range='10.10.10.0/23'
 iscsiprefix='10.10.10'
 
 verbose=True
