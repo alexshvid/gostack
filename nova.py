@@ -105,7 +105,7 @@ if openstack_conf.version == 'grizzly':
     props['firewall_driver'] = (None, 'nova.virt.libvirt.firewall.IptablesFirewallDriver')
     props['my_ip'] = (None, openstack_conf.my_ip)
     props['public_interface'] = (None, openstack_conf.pubint)
-    props['vlan_interface'] = (None, openstack_conf.pubint)
+    #props['vlan_interface'] = (None, openstack_conf.pubint)
     props['flat_interface'] = (None, openstack_conf.flatint)
     props['flat_network_bridge'] = (None, 'br100')
     props['floating_range'] = (None, openstack_conf.floating)
