@@ -11,12 +11,12 @@ myproject="myproject"
 myemail="my@email.com"
 mydomain='mydomain.com'
 
-pubint='eth0'
+pub_int='eth0'
 pubaddr='192.168.100.77'
 my_ip='192.168.100.77'
 floating_range='192.168.100.128/25'
 
-flatint='eth1'
+flat_int='eth1'
 flat_dhcpstart='10.10.10.2'
 fixed_range='10.10.10.0/23'
 iscsiprefix='10.10.10'
