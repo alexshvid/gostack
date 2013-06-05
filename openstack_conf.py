@@ -4,23 +4,21 @@
 #version="folsom"
 version="grizzly"
 
+#hyperv='kvm'
+hyperv='qemu'
+
 myproject="myproject"
 myemail="my@email.com"
 mydomain='mydomain.com'
 
+pubint='eth0'
 pubaddr='192.168.100.77'
-dhcpstart='192.168.100.129'
-dhcpend='192.168.100.254'
+my_ip='192.168.100.77'
 floating='192.168.100.128/25'
 
-#hyperv='kvm'
-hyperv='qemu'
-
-pubint='eth0'
 flatint='eth1'
-
+flat_dhcpstart='10.10.10.2'
 fixedrange='10.10.10.0/23'
-prvnetmask='255.255.255.0'
 iscsiprefix='10.10.10'
 
 verbose=True
