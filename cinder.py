@@ -49,10 +49,12 @@ def vg_create(vgname):
 
 
 if openstack_conf.version == 'essex':
-  vg_create('nova-volumes')
+  if openstack_conf.vgcreate:
+    vg_create('nova-volumes')
   osutils.run_std('apt-get install -y nova-volume')
 else:
-  vg_create('cinder-volumes')
+  if openstack_conf.vgcreate:
+    vg_create('cinder-volumes')
   osutils.run_std('apt-get install -y cinder-api cinder-scheduler cinder-volume iscsitarget iscsitarget-dkms')
 
   # Create database for Cinder

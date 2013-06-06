@@ -11,16 +11,19 @@ import osutils
 
 osutils.beroot()
 
-# Create database for Nova
-osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE nova;'" % (openstack_pass.root_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.nova_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.nova_db_pass) )
+if openstack_conf.my_ip == openstack_conf.pubaddr:
+  # Create database for Nova
+  osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE nova;'" % (openstack_pass.root_db_pass) )
+  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.nova_db_pass) )
+  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )
+  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.nova_db_pass) )
 
-packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
-
-if openstack_conf.version == 'grizzly':
-  packages = packages + ' nova-conductor'
+if openstack_conf.my_ip == openstack_conf.pubaddr:
+  packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
+  if openstack_conf.version == 'grizzly':
+    packages = packages + ' nova-conductor'
+else:
+  packages = 'nova-compute nova-network'
 
 if openstack_conf.hyperv == 'qemu':
   print "info: setup qemu"
@@ -121,19 +124,19 @@ if openstack_conf.version == 'grizzly':
     props['flat_network_dhcp_start'] = (None, openstack_conf.flat_dhcpstart)
     props['flat_injected'] = (None, False)
     props['connection_type'] = (None, 'libvirt')
-    props['fixed_range'] = (None, "''")
 
     p = patcher.patch_file('/etc/nova/nova.conf', props, True)
     print('info: /etc/nova/nova.conf patched for nova-network ' + str(p))
 
 
-# Patch sudoers file
-sudoers = patcher.read_text_file('/etc/sudoers')
-novaAll = 'nova ALL=(ALL) NOPASSWD:ALL'
-if not novaAll in sudoers:
-  with open('/etc/sudoers', 'w') as f:
-    f.write(sudoers + '\n' + novaAll + '\n')
-  print('info: file /etc/sudoers patched True')
+if openstack_conf.sudoers:
+  # Patch sudoers file
+  sudoers = patcher.read_text_file('/etc/sudoers')
+  novaAll = 'nova ALL=(ALL) NOPASSWD:ALL'
+  if not novaAll in sudoers:
+    with open('/etc/sudoers', 'w') as f:
+      f.write(sudoers + '\n' + novaAll + '\n')
+    print('info: file /etc/sudoers patched True')
 
 if openstack_conf.version in ['folsom', 'grizzly']:
 
@@ -169,11 +172,14 @@ if openstack_conf.version in ['folsom', 'grizzly']:
       f.write(libvirt_bin_new)
     print('info: /etc/default/libvirt-bin patched True');
 
-  osutils.run_std('service libvirt-bin restart')
+
+if openstack_conf.my_ip == openstack_conf.pubaddr:
+  # DB Sync
+  osutils.run_std('nova-manage db sync')
 
 
-# DB Sync
-osutils.run_std('nova-manage db sync')
+# Restart LibVirt
+osutils.run_std('service libvirt-bin restart')
 
 # Restart services
 osutils.run_std('cd /etc/init.d/; for i in $( ls nova-* ); do sudo service $i restart; done')

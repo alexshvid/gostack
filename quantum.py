@@ -39,13 +39,14 @@ if not openstack_conf.quantumExtInt in listBr:
 # Install the Quantum components:
 osutils.run_std('apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent')
 
-# Patch sudoers file
-sudoers = patcher.read_text_file('/etc/sudoers')
-quantumAll = 'quantum ALL=(ALL) NOPASSWD:ALL'
-if not quantumAll in sudoers:
-  with open('/etc/sudoers', 'w') as f:
-    f.write(sudoers + '\n' + quantumAll + '\n')
-  print('info: file /etc/sudoers patched True')
+if openstack_conf.sudoers:
+  # Patch sudoers file
+  sudoers = patcher.read_text_file('/etc/sudoers')
+  quantumAll = 'quantum ALL=(ALL) NOPASSWD:ALL'
+  if not quantumAll in sudoers:
+    with open('/etc/sudoers', 'w') as f:
+      f.write(sudoers + '\n' + quantumAll + '\n')
+    print('info: file /etc/sudoers patched True')
 
 # Create database for Quantum
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE quantum;'" % (openstack_pass.root_db_pass) )
