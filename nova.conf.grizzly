@@ -43,7 +43,7 @@ image_service=nova.image.glance.GlanceImageService
 
 # VNC Configuration #
 novnc_enable=true
-novncproxy_base_url=${'http://'+openstack_conf.pubaddr+':6080/vnc_auto.html'}
+novncproxy_base_url=${'http://'+openstack_conf.my_ip+':6080/vnc_auto.html'}
 novncproxy_port=6080
 vncserver_proxyclient_address=127.0.0.1
 vncserver_listen=127.0.0.1

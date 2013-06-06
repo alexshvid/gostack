@@ -27,7 +27,7 @@
 --vncserver_listen=127.0.0.1
 --resume_guests_state_on_host_boot=true
 --novnc_enable=true
---novncproxy_base_url=${'http://'+openstack_pass.pubhost+':6080/vnc_auto.html'}
+--novncproxy_base_url=${'http://'+openstack_pass.my_ip+':6080/vnc_auto.html'}
 --vncserver_proxyclient_address=127.0.0.1
 --network_manager=nova.network.manager.FlatDHCPManager
 --public_interface=${openstack_conf.pub_int}
