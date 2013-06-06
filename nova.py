@@ -95,6 +95,15 @@ if openstack_conf.version == 'grizzly':
     p = patcher.patch_file('/etc/nova/nova.conf', props, True)
     print('info: /etc/nova/nova.conf patched for quantum ' + str(p))
 
+    props = {}
+    props['libvirt_ovs_bridge'] = (None, 'br-int')
+    props['libvirt_vif_type'] = (None, 'ethernet')
+    props['libvirt_vif_driver'] = (None, 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver')
+    props['libvirt_use_virtio_for_bridges'] = (None, True)
+    p = patcher.patch_file('/etc/nova/nova-compute.conf', props, True)
+    print('info: /etc/nova/nova-compute.conf patched for quantum ' + str(p))
+
+
   else:
 
     props = {}
