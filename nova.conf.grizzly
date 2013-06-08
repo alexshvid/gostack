@@ -23,6 +23,7 @@ dmz_cidr=169.254.169.254/32
 ec2_dmz_host=${openstack_conf.pubaddr}
 enabled_apis=ec2,osapi_compute,metadata
 dhcp_domain=${openstack_conf.mydomain}
+instance_dns_domain=${openstack_conf.mydomain}
 
 #Metadata
 metadata_host = ${openstack_conf.pubaddr}
