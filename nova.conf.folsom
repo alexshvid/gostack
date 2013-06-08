@@ -24,6 +24,7 @@ ec2_dmz_host=${openstack_conf.pubaddr}
 metadata_host=${openstack_conf.pubaddr}
 metadata_listen=0.0.0.0
 enabled_apis=ec2,osapi_compute,metadata
+dhcp_domain=${openstack_conf.mydomain}
 
 # Auth
 use_deprecated_auth=false

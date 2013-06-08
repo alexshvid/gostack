@@ -6,6 +6,7 @@
 --use_deprecated_auth=false
 --auth_strategy=keystone
 --scheduler_driver=nova.scheduler.simple.SimpleScheduler
+--dhcp_domain=${openstack_conf.mydomain}
 --s3_host=${openstack_pass.pubhost}
 --ec2_host=${openstack_pass.pubhost}
 --rabbit_host=${openstack_pass.pubhost}
