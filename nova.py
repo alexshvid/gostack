@@ -23,7 +23,7 @@ if openstack_conf.my_ip == openstack_conf.pubaddr:
   if openstack_conf.version == 'grizzly':
     packages = packages + ' nova-conductor'
 else:
-  packages = 'nova-compute nova-network'
+  packages = 'nova-compute nova-network nova-api'
 
 if openstack_conf.hyperv == 'qemu':
   print "info: setup qemu"

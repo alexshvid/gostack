@@ -7,7 +7,6 @@
 --auth_strategy=keystone
 --scheduler_driver=nova.scheduler.simple.SimpleScheduler
 --dhcp_domain=${openstack_conf.mydomain}
---instance_dns_domain=${openstack_conf.mydomain}
 --s3_host=${openstack_pass.pubhost}
 --ec2_host=${openstack_pass.pubhost}
 --rabbit_host=${openstack_pass.pubhost}
@@ -36,7 +35,6 @@
 --flat_interface=${openstack_conf.flat_int}
 --flat_network_bridge=br100
 --auto_assign_floating_ip=False
---network_size=250
 --allow_same_net_traffic=true
 --floating_range=${openstack_conf.floating_range}
 --flat_network_dhcp_start=${openstack_conf.flat_dhcpstart}
@@ -47,6 +45,5 @@
 --root_helper=sudo nova-rootwrap
 --verbose
 --multi_host=True
---max_cores=250
 
 
