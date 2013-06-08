@@ -19,10 +19,10 @@ ec2_url=${'http://'+openstack_pass.pubhost+':8773/services/Cloud'}
 api_paste_config=/etc/nova/api-paste.ini
 allow_admin_api=true
 ec2_private_dns_show_ip=True
-#dmz_cidr=169.254.169.254/32
+dmz_cidr=169.254.169.254/32
 ec2_dmz_host=${openstack_conf.pubaddr}
 metadata_host=${openstack_conf.pubaddr}
-#metadata_listen=0.0.0.0
+metadata_listen=0.0.0.0
 enabled_apis=ec2,osapi_compute,metadata
 
 # Auth
