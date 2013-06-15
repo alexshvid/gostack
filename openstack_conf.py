@@ -27,7 +27,7 @@ fixed_range='10.10.10.0/23'
 iscsiprefix='10.10.10'
 
 verbose=True
-debug=True
+debug=False
 
 useQuantum=False
 quantumProjectSubNet='100.100.100.0/24'
