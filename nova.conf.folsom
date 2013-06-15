@@ -63,7 +63,7 @@ multi_host=True
 #firewall_driver=nova.virt.libvirt.firewall.IptablesFirewallDriver
 
 # Cinder #
-#iscsi_ip_prefix=${openstack_conf.iscsiprefix}
+#iscsi_ip_prefix=${openstack_conf.iscsi_prefix}
 #iscsi_ip_address=${openstack_conf.controller_ip}
 #iscsi_helper=tgtadm
 volume_api_class=nova.volume.cinder.API

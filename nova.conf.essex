@@ -16,7 +16,7 @@
 --my_ip=${openstack_conf.my_ip}
 --glance_api_servers=${openstack_pass.controller_host+':9292'}
 --image_service=nova.image.glance.GlanceImageService
---iscsi_ip_prefix=${openstack_conf.iscsiprefix}
+--iscsi_ip_prefix=${openstack_conf.iscsi_prefix}
 --iscsi_ip_address=${openstack_conf.controller_ip}
 --sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.controller_host+'/nova'}
 --ec2_url=${'http://'+openstack_pass.controller_host+':8773/services/Cloud'}

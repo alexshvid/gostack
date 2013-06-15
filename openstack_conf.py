@@ -24,7 +24,7 @@ floating_range='192.168.100.128/25'
 fixed_int='eth1'
 fixed_dhcpstart='10.10.10.2'
 fixed_range='10.10.10.0/23'
-iscsiprefix='10.10.10'
+iscsi_prefix='10.10.10'
 
 verbose=True
 debug=False
