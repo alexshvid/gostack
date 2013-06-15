@@ -32,6 +32,8 @@ Total 12Gb
 
 sudo nano /etc/network/interfaces
 
+for non quantum add
+
   # Public network
   auto eth0
   iface eth0 inet static
@@ -47,7 +49,11 @@ for quantum add
   # Public network
   auto eth0
   iface eth0 inet manual
-
+  
+  # Private network
+  auto eth1
+  iface eth1 inet manual
+  
   # Management network
   auto eth3
   iface eth3 inet static
