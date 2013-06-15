@@ -22,7 +22,7 @@ my_ip='192.168.100.77'
 floating_range='192.168.100.128/25'
 
 fixed_int='eth1'
-flat_dhcpstart='10.10.10.2'
+fixed_dhcpstart='10.10.10.2'
 fixed_range='10.10.10.0/23'
 iscsiprefix='10.10.10'
 

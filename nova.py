@@ -119,7 +119,7 @@ if openstack_conf.version == 'grizzly':
     props['flat_interface'] = (None, openstack_conf.fixed_int)
     props['flat_network_bridge'] = (None, 'br100')
     props['floating_range'] = (None, openstack_conf.floating_range)
-    props['flat_network_dhcp_start'] = (None, openstack_conf.flat_dhcpstart)
+    props['flat_network_dhcp_start'] = (None, openstack_conf.fixed_dhcpstart)
     props['flat_injected'] = (None, False)
     props['connection_type'] = (None, 'libvirt')
 

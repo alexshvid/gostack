@@ -37,7 +37,7 @@
 --auto_assign_floating_ip=False
 --allow_same_net_traffic=true
 --floating_range=${openstack_conf.floating_range}
---flat_network_dhcp_start=${openstack_conf.flat_dhcpstart}
+--flat_network_dhcp_start=${openstack_conf.fixed_dhcpstart}
 --flat_injected=False
 --force_dhcp_release
 --iscsi_helper=tgtadm

@@ -42,7 +42,7 @@ public_interface=${openstack_conf.pub_int}
 flat_interface=${openstack_conf.fixed_int}
 flat_network_bridge=br100
 floating_range=${openstack_conf.floating_range}
-flat_network_dhcp_start=${openstack_conf.flat_dhcpstart}
+flat_network_dhcp_start=${openstack_conf.fixed_dhcpstart}
 flat_injected=False
 connection_type=libvirt
 
