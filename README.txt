@@ -66,7 +66,13 @@ sudo service networking restart
 
 sudo nano /etc/hosts
 
+for non quantum
+
 192.168.100.77  your_host_name
+
+for quantum
+
+192.168.101.77  your_host_name
 
 5. Checkout this project
 sudo apt-get install git
