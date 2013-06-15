@@ -61,19 +61,19 @@ else:
   osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE cinder;'" % (openstack_pass.root_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON cinder.* TO 'cinder'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.cinder_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON cinder.* TO 'cinder'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.cinder_db_pass) )
-  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON cinder.* TO 'cinder'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.cinder_db_pass) )
+  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON cinder.* TO 'cinder'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.controller_host, openstack_pass.cinder_db_pass) )
 
   # Patch confs
   props = {}
-  props['service_host'] = ('127.0.0.1', openstack_pass.pubhost)
-  props['auth_host'] = ('127.0.0.1', openstack_pass.pubhost)
+  props['service_host'] = ('127.0.0.1', openstack_pass.controller_host)
+  props['auth_host'] = ('127.0.0.1', openstack_pass.controller_host)
   props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
   props['admin_user'] = ('%SERVICE_USER%', 'admin')
   props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
   p = patcher.patch_file('/etc/cinder/api-paste.ini', props, True)
   print('info: /etc/cinder/api-paste.ini patched ' + str(p))
 
-  sql = "mysql://cinder:%s@%s:3306/cinder" % (openstack_pass.cinder_db_pass, openstack_pass.pubhost)
+  sql = "mysql://cinder:%s@%s:3306/cinder" % (openstack_pass.cinder_db_pass, openstack_pass.controller_host)
 
   props = {}
   props['sql_connection'] = (None, sql)
@@ -84,7 +84,7 @@ else:
   props['state_path'] = (None, '/var/lib/cinder')
   props['volumes_dir'] = (None, '/var/lib/cinder/volumes')
 
-  props['rabbit_host'] = (None, openstack_pass.pubhost)
+  props['rabbit_host'] = (None, openstack_pass.controller_host)
   props['rabbit_port'] = (None, 5672)
   props['rabbit_userid'] = (None, 'guest')
   props['rabbit_password'] = (None, openstack_pass.rabbit_pass)

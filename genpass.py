@@ -16,7 +16,7 @@ def generate_pass(pass_length=64):
     choice = random.choice
   return ''.join(map(lambda x: choice(string.digits + string.letters), range(pass_length)))
 
-pubhost=socket.gethostname()
+controller_host=socket.gethostname()
 admin_token=generate_pass(20)
 rabbit_pass=generate_pass(16)
 keystone_db_pass=generate_pass(16)
@@ -30,7 +30,7 @@ openstack_pass=generate_pass(16)
 
 with open('openstack_pass.py', 'w') as pf:
   pf.write("#!/usr/bin/python\n\n")
-  pf.write("pubhost='" + pubhost + "'\n")
+  pf.write("controller_host='" + controller_host + "'\n")
   pf.write("admin_token='" + admin_token + "'\n")
   pf.write("rabbit_pass='" + rabbit_pass + "'\n")
   pf.write("keystone_db_pass='" + keystone_db_pass + "'\n")
@@ -48,8 +48,8 @@ export OS_PASSWORD=""" + openstack_pass + """
 export SERVICE_TOKEN=""" + admin_token + """
 export OS_TENANT_NAME=admin
 export OS_USERNAME=admin
-export SERVICE_ENDPOINT="http://""" + pubhost + """:35357/v2.0"
-export OS_AUTH_URL="http://""" + pubhost + """:5000/v2.0/"
+export SERVICE_ENDPOINT="http://""" + controller_host + """:35357/v2.0"
+export OS_AUTH_URL="http://""" + controller_host + """:5000/v2.0/"
 """)
 
 os.system('chmod +x creds')

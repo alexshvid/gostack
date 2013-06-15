@@ -16,7 +16,7 @@ if openstack_conf.my_ip == openstack_conf.controller_ip:
   osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE nova;'" % (openstack_pass.root_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.nova_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )
-  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.nova_db_pass) )
+  osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.controller_host, openstack_pass.nova_db_pass) )
 
 if openstack_conf.my_ip == openstack_conf.controller_ip:
   packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
@@ -56,7 +56,7 @@ osutils.run_std('apt-get install -y tgt open-iscsi open-iscsi-utils')
 # Patch confs
 
 props = {}
-props['auth_host'] = ('127.0.0.1', openstack_pass.pubhost)
+props['auth_host'] = ('127.0.0.1', openstack_pass.controller_host)
 props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
 props['admin_user'] = ('%SERVICE_USER%', 'admin')
 props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)
@@ -83,12 +83,12 @@ if openstack_conf.version == 'grizzly':
 
     props = {}
     props['network_api_class'] = (None, 'nova.network.quantumv2.api.API')
-    props['quantum_url'] = (None, 'http://'+openstack_pass.pubhost+':9696')
+    props['quantum_url'] = (None, 'http://'+openstack_pass.controller_host+':9696')
     props['quantum_auth_strategy'] = (None, 'keystone')
     props['quantum_admin_tenant_name'] = (None, 'service')
     props['quantum_admin_username'] = (None, 'quantum')
     props['quantum_admin_password'] = (None, openstack_pass.openstack_pass)
-    props['quantum_admin_auth_url'] = (None, 'http://'+openstack_pass.pubhost+':35357/v2.0')
+    props['quantum_admin_auth_url'] = (None, 'http://'+openstack_pass.controller_host+':35357/v2.0')
     props['libvirt_vif_driver'] = (None, 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver')
     props['linuxnet_interface_driver'] = (None, 'nova.network.linux_net.LinuxOVSInterfaceDriver')
     props['firewall_driver'] = (None, 'nova.virt.libvirt.firewall.IptablesFirewallDriver')

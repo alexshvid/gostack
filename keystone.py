@@ -13,7 +13,7 @@ osutils.beroot()
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE keystone;'" % (openstack_pass.root_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON keystone.* TO 'keystone'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.keystone_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON keystone.* TO 'keystone'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.keystone_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON keystone.* TO 'keystone'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.keystone_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON keystone.* TO 'keystone'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.controller_host, openstack_pass.keystone_db_pass) )
 
 osutils.run_std('apt-get install -y keystone python-keystone python-keystoneclient')
 
@@ -28,7 +28,7 @@ props['[DEFAULT]public_port'] = (None, 5000)
 props['[DEFAULT]admin_port'] = (None, 35357)
 props['[DEFAULT]compute_port'] = (None, 8774)
 
-sql = "mysql://keystone:%s@%s:3306/keystone" % (openstack_pass.keystone_db_pass, openstack_pass.pubhost)
+sql = "mysql://keystone:%s@%s:3306/keystone" % (openstack_pass.keystone_db_pass, openstack_pass.controller_host)
 
 props['[sql]connection'] = ('sqlite:////var/lib/keystone/keystone.db', sql)
 props['[sql]idle_timeout'] = (None, 200)
@@ -104,35 +104,35 @@ if openstack_conf.version in ["folsom", "grizzly"]:
 
 # Create EndPoints
 novaEndpointId = keystone_utils.service_create('nova', 'compute', 'OpenStack Compute Service')
-url = "http://%s:8774/v2/%s" % (openstack_pass.pubhost, '%(tenant_id)s')
+url = "http://%s:8774/v2/%s" % (openstack_pass.controller_host, '%(tenant_id)s')
 keystone_utils.endpoint_create('RegionOne', novaEndpointId, url, url, url)
 
 cinderEndpointId = keystone_utils.service_create('cinder', 'volume', 'OpenStack Volume Service')
-url = "http://%s:8776/v1/%s" % (openstack_pass.pubhost, '%(tenant_id)s')
+url = "http://%s:8776/v1/%s" % (openstack_pass.controller_host, '%(tenant_id)s')
 keystone_utils.endpoint_create('RegionOne', cinderEndpointId, url, url, url)
 
 glanceEndpointId = keystone_utils.service_create('glance', 'image', 'OpenStack Image Service')
-url = "http://%s:9292/v2" % (openstack_pass.pubhost)
+url = "http://%s:9292/v2" % (openstack_pass.controller_host)
 keystone_utils.endpoint_create('RegionOne', glanceEndpointId, url, url, url)
 
 swiftEndpointId = keystone_utils.service_create('swift', 'object-store', 'OpenStack Storage Service')
-url = "http://%s:8080/v1/AUTH_%s" % (openstack_pass.pubhost, '%(tenant_id)s')
-adminurl = "http://%s:8080/v1" % (openstack_pass.pubhost)
+url = "http://%s:8080/v1/AUTH_%s" % (openstack_pass.controller_host, '%(tenant_id)s')
+adminurl = "http://%s:8080/v1" % (openstack_pass.controller_host)
 keystone_utils.endpoint_create('RegionOne', swiftEndpointId, url, adminurl, url)
 
 keystoneEndpointId = keystone_utils.service_create('keystone', 'identity', 'OpenStack Identity Service')
-url = "http://%s:5000/v2.0" % (openstack_pass.pubhost)
-adminurl = "http://%s:35357/v2.0" % (openstack_pass.pubhost)
+url = "http://%s:5000/v2.0" % (openstack_pass.controller_host)
+adminurl = "http://%s:35357/v2.0" % (openstack_pass.controller_host)
 keystone_utils.endpoint_create('RegionOne', keystoneEndpointId, url, adminurl, url)
 
 ec2EndpointId = keystone_utils.service_create('ec2', 'ec2', 'OpenStack EC2 Service')
-url = "http://%s:8773/services/Cloud" % (openstack_pass.pubhost)
-adminurl = "http://%s:8773/services/Admin" % (openstack_pass.pubhost)
+url = "http://%s:8773/services/Cloud" % (openstack_pass.controller_host)
+adminurl = "http://%s:8773/services/Admin" % (openstack_pass.controller_host)
 keystone_utils.endpoint_create('RegionOne', ec2EndpointId, url, adminurl, url)
 
 if openstack_conf.useQuantum:
   quantumEndpointId = keystone_utils.service_create('quantum', 'network', 'OpenStack Networking Service')
-  url = "http://%s:9696/" % (openstack_pass.pubhost)
+  url = "http://%s:9696/" % (openstack_pass.controller_host)
   keystone_utils.endpoint_create('RegionOne', quantumEndpointId, url, url, url)
 
 

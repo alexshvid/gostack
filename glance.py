@@ -14,9 +14,9 @@ osutils.beroot()
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE glance;'" % (openstack_pass.root_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.glance_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.glance_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.glance_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON glance.* TO 'glance'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.controller_host, openstack_pass.glance_db_pass) )
 
-sql = "mysql://glance:%s@%s:3306/glance" % (openstack_pass.glance_db_pass, openstack_pass.pubhost)
+sql = "mysql://glance:%s@%s:3306/glance" % (openstack_pass.glance_db_pass, openstack_pass.controller_host)
 
 if openstack_conf.version == 'essex':
   osutils.run_std('apt-get install -y glance glance-api glance-client glance-common glance-registry python-glance')
@@ -61,7 +61,7 @@ else:
   props['sql_connection'] = ('sqlite:////var/lib/glance/glance.sqlite', sql)
   props['[paste_deploy]flavor'] = (None, 'keystone')
 
-  props['auth_host'] = ('127.0.0.1', openstack_pass.pubhost)
+  props['auth_host'] = ('127.0.0.1', openstack_pass.controller_host)
   props['admin_tenant_name'] = ('%SERVICE_TENANT_NAME%', 'admin')
   props['admin_user'] = ('%SERVICE_USER%', 'admin')
   props['admin_password'] = ('%SERVICE_PASSWORD%', openstack_pass.openstack_pass)

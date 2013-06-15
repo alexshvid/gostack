@@ -52,7 +52,7 @@ if openstack_conf.sudoers:
 osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE quantum;'" % (openstack_pass.root_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.quantum_db_pass) )
 osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.quantum_db_pass) )
-osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.quantum_db_pass) )
+osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON quantum.* TO 'quantum'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.controller_host, openstack_pass.quantum_db_pass) )
 
 # Restart Quantum
 osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i status; done')
@@ -61,7 +61,7 @@ osutils.run_std('cd /etc/init.d/; for i in $( ls quantum-* ); do sudo service $i
 # Edit /etc/quantum/api-paste.ini
 props = {}
 props['[filter:authtoken]paste.filter_factory'] = (None, 'keystoneclient.middleware.auth_token:filter_factory')
-props['[filter:authtoken]auth_host'] = (None, openstack_pass.pubhost)
+props['[filter:authtoken]auth_host'] = (None, openstack_pass.controller_host)
 props['[filter:authtoken]auth_port'] = (None, 35357)
 props['[filter:authtoken]auth_protocol'] = (None, 'http')
 props['[filter:authtoken]admin_tenant_name'] = (None, 'admin')
@@ -71,7 +71,7 @@ p = patcher.patch_file('/etc/quantum/api-paste.ini', props, True)
 print('info: /etc/quantum/api-paste.ini patched ' + str(p))
 
 # SQL connection string
-sql = "mysql://quantum:%s@%s:3306/quantum" % (openstack_pass.quantum_db_pass, openstack_pass.pubhost)
+sql = "mysql://quantum:%s@%s:3306/quantum" % (openstack_pass.quantum_db_pass, openstack_pass.controller_host)
 
 # Edit the OVS plugin configuration file
 props = {}
@@ -88,7 +88,7 @@ print('info: /etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini patched ' +
 
 # Update /etc/quantum/metadata_agent.ini
 props = {}
-props['auth_url'] = (None, 'http://%s:35357/v2.0' % (openstack_pass.pubhost))
+props['auth_url'] = (None, 'http://%s:35357/v2.0' % (openstack_pass.controller_host))
 props['auth_region'] = (None, 'RegionOne')
 props['admin_tenant_name'] = (None, 'admin')
 props['admin_user'] = (None, 'admin')
@@ -111,7 +111,7 @@ print('info: /etc/quantum/dhcp_agent.ini patched ' + str(p))
 props = {}
 props['[DEFAULT]debug'] = (None, openstack_conf.debug)
 props['[DEFAULT]verbose'] = (None, openstack_conf.verbose)
-props['[keystone_authtoken]auth_host'] = (None, openstack_pass.pubhost)
+props['[keystone_authtoken]auth_host'] = (None, openstack_pass.controller_host)
 props['[keystone_authtoken]auth_port'] = (None, 35357)
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
 props['[keystone_authtoken]admin_tenant_name'] = (None, 'admin')
@@ -120,7 +120,7 @@ props['[keystone_authtoken]admin_password'] = (None, openstack_pass.openstack_pa
 props['[keystone_authtoken]auth_protocol'] = (None, 'http')
 props['[keystone_authtoken]signing_dir'] = (None, '/var/lib/quantum/keystone-signing')
 
-props['[DEFAULT]rabbit_host'] = (None, openstack_pass.pubhost)
+props['[DEFAULT]rabbit_host'] = (None, openstack_pass.controller_host)
 props['[DEFAULT]rabbit_userid'] = (None, 'guest')
 props['[DEFAULT]rabbit_password'] = ('guest', openstack_pass.rabbit_pass)
 

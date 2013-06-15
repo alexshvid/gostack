@@ -1,7 +1,7 @@
 [DEFAULT]
 
 # MySQL Connection #
-sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.pubhost+'/nova'}
+sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.controller_host+'/nova'}
 
 # Nova Scheduler #
 rabbit_host=${openstack_conf.controller_ip}
@@ -14,8 +14,8 @@ osapi_compute_extension=nova.api.openstack.compute.contrib.standard_extensions
 cc_host=${openstack_conf.controller_ip}
 s3_host=${openstack_conf.controller_ip}
 ec2_host=${openstack_conf.controller_ip}
-nova_url=${'http://'+openstack_pass.pubhost+':8774/v1.1/'}
-ec2_url=${'http://'+openstack_pass.pubhost+':8773/services/Cloud'}
+nova_url=${'http://'+openstack_pass.controller_host+':8774/v1.1/'}
+ec2_url=${'http://'+openstack_pass.controller_host+':8773/services/Cloud'}
 api_paste_config=/etc/nova/api-paste.ini
 allow_admin_api=true
 ec2_private_dns_show_ip=True
@@ -32,14 +32,14 @@ metadata_listen_port = 8775
 # Auth
 use_deprecated_auth=false
 auth_strategy=keystone
-keystone_ec2_url=${'http://'+openstack_pass.pubhost+':5000/v2.0/ec2tokens'}
+keystone_ec2_url=${'http://'+openstack_pass.controller_host+':5000/v2.0/ec2tokens'}
 
 # Cinder #
 volume_api_class=nova.volume.cinder.API
 osapi_volume_listen_port=5900
 
 # Imaging Service #
-glance_api_servers=${openstack_pass.pubhost+':9292'}
+glance_api_servers=${openstack_pass.controller_host+':9292'}
 image_service=nova.image.glance.GlanceImageService
 
 # VNC Configuration #
