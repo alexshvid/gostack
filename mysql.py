@@ -1,11 +1,6 @@
 #!/usr/bin/python
 
-import re
-import os
 import os.path
-import shutil
-import subprocess
-import time
 import openstack_pass
 import patcher
 import osutils

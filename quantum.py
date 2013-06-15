@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import os
-import subprocess
 import patcher
 import openstack_conf
 import openstack_pass

@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
 import re
-import os
-import shutil
-import subprocess
 import osutils
 import openstack_conf
 import openstack_pass

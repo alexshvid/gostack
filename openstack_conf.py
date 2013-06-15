@@ -3,6 +3,7 @@
 aptupdate=False
 sudoers=True
 vgcreate=True
+downloadImage=True
 
 #version="essex"      # now supports only essex on Ubuntu 12.4
 #version="folsom"

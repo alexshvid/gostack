@@ -1,9 +1,6 @@
 #!/usr/bin/python
 
-import os
-import subprocess
 import patcher
-import openstack_conf
 import osutils
 
 osutils.beroot()

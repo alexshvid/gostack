@@ -6,7 +6,6 @@ import openstack_pass
 import time
 import osutils
 import os
-import subprocess
 
 osutils.beroot()
 
@@ -84,16 +83,19 @@ time.sleep(2)
 osutils.run_std("service glance-api restart && service glance-registry restart")
 time.sleep(2)
 
-#Download Ubuntu Precise 12.04
-if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
-  print('download ubuntu image')
-  osutils.run_std("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img")
+if openstack_conf.downloadImage:
 
-#Import Ubuntu Cloud 12.04 to Glance
-glanceIndex = osutils.run('glance index')
-if not 'Ubuntu-12.04' in glanceIndex:
-  print('add ubuntu image')
-  osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
+  #Import Ubuntu Cloud 12.04 to Glance
+  glanceIndex = osutils.run('glance index')
+  if not 'Ubuntu-12.04' in glanceIndex:
+      
+    #Download Ubuntu Precise 12.04
+    if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
+      print('download ubuntu image')
+      osutils.run_std("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img")
+      
+    print('add ubuntu image')
+    osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
 
 
 
