@@ -16,7 +16,7 @@ myproject="myproject"
 myemail="my@email.com"
 mydomain='mydomain.com'
 
-pub_int='eth0'
+floating_int='eth0'
 controller_ip='192.168.100.77'
 my_ip='192.168.100.77'
 floating_range='192.168.100.128/25'

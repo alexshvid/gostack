@@ -31,7 +31,7 @@
 --novncproxy_base_url=${'http://'+openstack_pass.my_ip+':6080/vnc_auto.html'}
 --vncserver_proxyclient_address=127.0.0.1
 --network_manager=nova.network.manager.FlatDHCPManager
---public_interface=${openstack_conf.pub_int}
+--public_interface=${openstack_conf.floating_int}
 --flat_interface=${openstack_conf.fixed_int}
 --flat_network_bridge=br100
 --auto_assign_floating_ip=False
