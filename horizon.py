@@ -20,9 +20,9 @@ osutils.run_std('service apache2 restart')
 
 
 if openstack_conf.version == 'essex':
-  print("Open horizon on http://%s" % (openstack_conf.pubaddr) )
+  print("Open horizon on http://%s" % (openstack_conf.controller_ip) )
 else:
-  print("Open horizon on http://%s/horizon" % (openstack_conf.pubaddr) )
+  print("Open horizon on http://%s/horizon" % (openstack_conf.controller_ip) )
 
 print("username = admin")
 print("password = " + openstack_pass.openstack_pass)

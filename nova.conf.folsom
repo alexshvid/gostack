@@ -4,16 +4,16 @@
 sql_connection=${'mysql://nova:'+openstack_pass.nova_db_pass+'@'+openstack_pass.pubhost+'/nova'}
 
 # Nova Scheduler #
-rabbit_host=${openstack_conf.pubaddr}
+rabbit_host=${openstack_conf.controller_ip}
 rabbit_password=${openstack_pass.rabbit_pass}
 scheduler_driver=nova.scheduler.simple.SimpleScheduler
 #scheduler_driver=nova.scheduler.multi.MultiScheduler
 #compute_scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
 
 # API
-cc_host=${openstack_conf.pubaddr}
-s3_host=${openstack_conf.pubaddr}
-ec2_host=${openstack_conf.pubaddr}
+cc_host=${openstack_conf.controller_ip}
+s3_host=${openstack_conf.controller_ip}
+ec2_host=${openstack_conf.controller_ip}
 nova_url=${'http://'+openstack_pass.pubhost+':8774/v1.1/'}
 ec2_url=${'http://'+openstack_pass.pubhost+':8773/services/Cloud'}
 api_paste_config=/etc/nova/api-paste.ini
@@ -64,7 +64,7 @@ multi_host=True
 
 # Cinder #
 #iscsi_ip_prefix=${openstack_conf.iscsiprefix}
-#iscsi_ip_address=${openstack_conf.pubaddr}
+#iscsi_ip_address=${openstack_conf.controller_ip}
 #iscsi_helper=tgtadm
 volume_api_class=nova.volume.cinder.API
 osapi_volume_listen_port=5900

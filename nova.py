@@ -11,14 +11,14 @@ import osutils
 
 osutils.beroot()
 
-if openstack_conf.my_ip == openstack_conf.pubaddr:
+if openstack_conf.my_ip == openstack_conf.controller_ip:
   # Create database for Nova
   osutils.run_std("mysql -u root -p%s -e 'CREATE DATABASE nova;'" % (openstack_pass.root_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, '%', openstack_pass.nova_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, 'localhost', openstack_pass.nova_db_pass) )
   osutils.run_std("mysql -u root -p%s -e \"GRANT ALL ON nova.* TO 'nova'@'%s' IDENTIFIED BY '%s';\"" % (openstack_pass.root_db_pass, openstack_pass.pubhost, openstack_pass.nova_db_pass) )
 
-if openstack_conf.my_ip == openstack_conf.pubaddr:
+if openstack_conf.my_ip == openstack_conf.controller_ip:
   packages = 'nova-api nova-cert nova-common nova-compute nova-doc python-nova python-novaclient nova-consoleauth nova-scheduler nova-network'
   if openstack_conf.version == 'grizzly':
     packages = packages + ' nova-conductor'
@@ -173,7 +173,7 @@ if openstack_conf.version in ['folsom', 'grizzly']:
     print('info: /etc/default/libvirt-bin patched True');
 
 
-if openstack_conf.my_ip == openstack_conf.pubaddr:
+if openstack_conf.my_ip == openstack_conf.controller_ip:
   # DB Sync
   osutils.run_std('nova-manage db sync')
 
