@@ -32,7 +32,7 @@
 --vncserver_proxyclient_address=127.0.0.1
 --network_manager=nova.network.manager.FlatDHCPManager
 --public_interface=${openstack_conf.pub_int}
---flat_interface=${openstack_conf.flat_int}
+--flat_interface=${openstack_conf.fixed_int}
 --flat_network_bridge=br100
 --auto_assign_floating_ip=False
 --allow_same_net_traffic=true

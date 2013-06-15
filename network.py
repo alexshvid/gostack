@@ -18,8 +18,8 @@ if not openstack_conf.useQuantum:
     hasNetwork = cidr in out
 
   if not hasNetwork:
-    print('info: network create %s on %s' % (openstack_conf.fixed_range, openstack_conf.flat_int) )
-    osutils.run_std('nova-manage network create private --fixed_range_v4=%s --num_networks=1 --bridge=br100 --bridge_interface=%s --network_size=250 --multi_host=T' % (openstack_conf.fixed_range, openstack_conf.flat_int) )
+    print('info: network create %s on %s' % (openstack_conf.fixed_range, openstack_conf.fixed_int) )
+    osutils.run_std('nova-manage network create private --fixed_range_v4=%s --num_networks=1 --bridge=br100 --bridge_interface=%s --network_size=250 --multi_host=T' % (openstack_conf.fixed_range, openstack_conf.fixed_int) )
 
   floatingOut = osutils.run('nova-manage floating list')
 

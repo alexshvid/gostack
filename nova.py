@@ -116,7 +116,7 @@ if openstack_conf.version == 'grizzly':
     props['my_ip'] = (None, openstack_conf.my_ip)
     props['public_interface'] = (None, openstack_conf.pub_int)
     #props['vlan_interface'] = (None, openstack_conf.pub_int)
-    props['flat_interface'] = (None, openstack_conf.flat_int)
+    props['flat_interface'] = (None, openstack_conf.fixed_int)
     props['flat_network_bridge'] = (None, 'br100')
     props['floating_range'] = (None, openstack_conf.floating_range)
     props['flat_network_dhcp_start'] = (None, openstack_conf.flat_dhcpstart)
