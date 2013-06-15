@@ -3,7 +3,7 @@ gostack
 
 Installation Scripts for OpenStack (Ubuntu 12.4)
 
-How to Install Essex to Ubuntu 12.4 in 5 minutes
+How to Install Essex/Folsom/Grizzly to Ubuntu 12.4 in 5 minutes
 
 1. In VirtualBox create two Host-Only Ethernet adapters
 192.168.100.0/24  vboxif1      # Public network
