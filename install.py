@@ -6,6 +6,9 @@ import osutils
 
 osutils.beroot()
 
+if not openstack_pass.has_creds():
+  exit("run 'source creds' in your shell");
+
 if openstack_conf.apt_update:
   osutils.run_std('./aptupdate.py')
 

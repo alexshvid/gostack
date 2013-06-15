@@ -29,6 +29,7 @@ openstack_pass=generate_pass(16)
 
 with open('openstack_pass.py', 'w') as pf:
   pf.write("#!/usr/bin/python\n\n")
+  pf.write("import os\n\n")
   pf.write("controller_host='" + controller_host + "'\n")
   pf.write("admin_token='" + admin_token + "'\n")
   pf.write("rabbit_pass='" + rabbit_pass + "'\n")
@@ -40,6 +41,15 @@ with open('openstack_pass.py', 'w') as pf:
   pf.write("quantum_metadata_proxy_shared_secret='" + quantum_metadata_proxy_shared_secret + "'\n")
   pf.write("root_db_pass='" + root_db_pass + "'\n")
   pf.write("openstack_pass='" + openstack_pass + "'\n")
+  pf.write("\n")
+  pf.write("creds = ['OS_PASSWORD', 'SERVICE_TOKEN', 'OS_TENANT_NAME', 'OS_USERNAME', 'SERVICE_ENDPOINT', 'OS_AUTH_URL']\n")
+  pf.write("\n")
+  pf.write("def has_creds():\n")
+  pf.write("  for cred in creds:\n")
+  pf.write("    if not os.environ.has_key(cred):\n")
+  pf.write("      return False\n")
+  pf.write("  return True\n")
+  pf.write("\n")
 
 with open('creds', 'w') as f:
  f.write("""
