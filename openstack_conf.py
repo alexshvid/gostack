@@ -3,7 +3,7 @@
 aptupdate=False
 sudoers=True
 vgcreate=True
-downloadImage=True
+download_image=True
 
 #version="essex"
 #version="folsom"
