@@ -6,7 +6,7 @@ import osutils
 
 osutils.beroot()
 
-if not openstack_conf.useQuantum:
+if not openstack_conf.use_quantum:
   hasNetwork = False
   if openstack_conf.version == 'essex':
     hasNetwork = os.system('nova-manage network list') == 0

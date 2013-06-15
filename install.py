@@ -6,7 +6,7 @@ import osutils
 
 osutils.beroot()
 
-if openstack_conf.aptupdate:
+if openstack_conf.apt_update:
   osutils.run_std('./aptupdate.py')
 
 osutils.run_std('./interfaces.py')

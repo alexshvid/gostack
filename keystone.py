@@ -86,14 +86,14 @@ novaUserId    = keystone_utils.user_create('nova',    openstack_pass.openstack_p
 glanceUserId  = keystone_utils.user_create('glance',   openstack_pass.openstack_pass, 'glance@' + openstack_conf.mydomain, serviceTenantId)
 cinderUserId  = keystone_utils.user_create('cinder',   openstack_pass.openstack_pass, 'cinder@'  + openstack_conf.mydomain, serviceTenantId)
 swiftUserId   = keystone_utils.user_create('swift',    openstack_pass.openstack_pass, 'swift@'    + openstack_conf.mydomain, serviceTenantId)
-if openstack_conf.useQuantum:
+if openstack_conf.use_quantum:
   quantumUserId = keystone_utils.user_create('quantum', openstack_pass.openstack_pass, 'quantum@' + openstack_conf.mydomain, serviceTenantId)
 
 keystone_utils.user_role_add(novaUserId,    adminRoleId, serviceTenantId)
 keystone_utils.user_role_add(glanceUserId,  adminRoleId, serviceTenantId)
 keystone_utils.user_role_add(cinderUserId,  adminRoleId, serviceTenantId)
 keystone_utils.user_role_add(swiftUserId,   adminRoleId, serviceTenantId)
-if openstack_conf.useQuantum:
+if openstack_conf.use_quantum:
   keystone_utils.user_role_add(quantumUserId, adminRoleId, serviceTenantId)
 
 if openstack_conf.version in ["folsom", "grizzly"]:
@@ -128,7 +128,7 @@ url = "http://%s:8773/services/Cloud" % (openstack_pass.controller_host)
 adminurl = "http://%s:8773/services/Admin" % (openstack_pass.controller_host)
 keystone_utils.endpoint_create('RegionOne', ec2EndpointId, url, adminurl, url)
 
-if openstack_conf.useQuantum:
+if openstack_conf.use_quantum:
   quantumEndpointId = keystone_utils.service_create('quantum', 'network', 'OpenStack Networking Service')
   url = "http://%s:9696/" % (openstack_pass.controller_host)
   keystone_utils.endpoint_create('RegionOne', quantumEndpointId, url, url, url)

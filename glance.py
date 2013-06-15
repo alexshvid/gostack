@@ -83,7 +83,7 @@ time.sleep(2)
 osutils.run_std("service glance-api restart && service glance-registry restart")
 time.sleep(2)
 
-if openstack_conf.download_image:
+if openstack_conf.glance_download_image:
 
   #Import Ubuntu Cloud 12.04 to Glance
   glanceIndex = osutils.run('glance index')

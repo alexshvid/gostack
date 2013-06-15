@@ -77,7 +77,7 @@ print('info: /etc/nova/nova-compute.conf saved')
 
 # Setup Networks
 if openstack_conf.version == 'grizzly':
-  if openstack_conf.useQuantum:
+  if openstack_conf.use_quantum:
 
     props = {}
     props['network_api_class'] = (None, 'nova.network.quantumv2.api.API')
@@ -127,7 +127,7 @@ if openstack_conf.version == 'grizzly':
     print('info: /etc/nova/nova.conf patched for nova-network ' + str(p))
 
 
-if openstack_conf.sudoers:
+if openstack_conf.add_sudoers:
   # Patch sudoers file
   sudoers = patcher.read_text_file('/etc/sudoers')
   novaAll = 'nova ALL=(ALL) NOPASSWD:ALL'

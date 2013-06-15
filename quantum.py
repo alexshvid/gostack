@@ -8,8 +8,8 @@ import keystone_utils
 
 osutils.beroot()
 
-if not openstack_conf.useQuantum:
-  exit("info: useQuantum False")
+if not openstack_conf.use_quantum:
+  exit("info: use_quantum False")
 
 osutils.run_std('apt-get install -y openvswitch-switch openvswitch-datapath-dkms')
 
@@ -24,20 +24,20 @@ if not 'br-ex' in listBr:
   osutils.run_std('ovs-vsctl br-set-external-id br-ex bridge-id br-ex')
 
 listBr = osutils.run('ovs-vsctl list-ports br-int')
-if not openstack_conf.quantumIntInt in listBr:
-  print('info: add-port br-int ' + openstack_conf.quantumIntInt)
-  osutils.run_std('ovs-vsctl add-port br-int ' + openstack_conf.quantumIntInt)
+if not openstack_conf.fixed_int in listBr:
+  print('info: add-port br-int ' + openstack_conf.fixed_int)
+  osutils.run_std('ovs-vsctl add-port br-int ' + openstack_conf.fixed_int)
 
 listBr = osutils.run('ovs-vsctl list-ports br-ex')
-if not openstack_conf.quantumExtInt in listBr:
-  print('info: add-port br-ex ' + openstack_conf.quantumExtInt)
-  osutils.run_std('ovs-vsctl add-port br-ex ' + openstack_conf.quantumExtInt)
+if not openstack_conf.floating_int in listBr:
+  print('info: add-port br-ex ' + openstack_conf.floating_int)
+  osutils.run_std('ovs-vsctl add-port br-ex ' + openstack_conf.floating_int)
 
 
 # Install the Quantum components:
 osutils.run_std('apt-get install -y quantum-server quantum-plugin-openvswitch quantum-plugin-openvswitch-agent dnsmasq quantum-dhcp-agent quantum-l3-agent')
 
-if openstack_conf.sudoers:
+if openstack_conf.add_sudoers:
   # Patch sudoers file
   sudoers = patcher.read_text_file('/etc/sudoers')
   quantumAll = 'quantum ALL=(ALL) NOPASSWD:ALL'
@@ -175,8 +175,8 @@ if adminTenantId != None:
   netId = quantum_net_create(adminTenantId, 'net_ext', True)
   print("ext netId = %s" % (netId))
 
-  opts = '--allocation-pool start=%s,end=%s --enable_dhcp=False --gateway %s' % (openstack_conf.quantumFloatingStart, openstack_conf.quantumFloatingEnd, openstack_conf.quantumFloatingGateway)
-  subNetId = quantum_subnet_create(adminTenantId, 'net_ext', openstack_conf.quantumFloating, opts)
+  opts = '--allocation-pool start=%s,end=%s --enable_dhcp=False --gateway %s' % (openstack_conf.floating_range_start, openstack_conf.floating_range_end, openstack_conf.floating_range_gw)
+  subNetId = quantum_subnet_create(adminTenantId, 'net_ext', openstack_conf.floating_range, opts)
   print("ext subNetId = %s" % (subNetId))
 
   routerId = quantum_router_create(adminTenantId, 'router_ext')
@@ -201,7 +201,7 @@ if projectTenantId != None:
   netId = quantum_net_create(projectTenantId, netName)
   print("project netId = %s" % (netId))
 
-  subNetId = quantum_subnet_create(projectTenantId, netName, openstack_conf.quantumProjectSubNet)
+  subNetId = quantum_subnet_create(projectTenantId, netName, openstack_conf.fixed_range)
   print("project subNetId = %s" % (subNetId))
 
   # Add the router to the subnet
