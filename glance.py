@@ -91,12 +91,21 @@ if openstack_conf.glance_download_image:
       
     #Download Ubuntu Precise 12.04
     if not os.path.isfile("precise-server-cloudimg-amd64-disk1.img"):
-      print('download ubuntu image')
+      print('download ubuntu 12.04 image')
       osutils.run_std("wget https://cloud-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64-disk1.img")
       
-    print('add ubuntu image')
+    print('add ubuntu 12.04 image')
     osutils.run_std("glance add name=Ubuntu-12.04 is_public=true container_format=ovf disk_format=qcow2 < precise-server-cloudimg-amd64-disk1.img")
 
+  if not 'Ubuntu-14.10' in glanceIndex:
+      
+    #Download Ubuntu Utopic 14.10
+    if not os.path.isfile("utopic-server-cloudimg-amd64-disk1.img"):
+      print('download ubuntu 14.10 image')
+      osutils.run_std("wget https://cloud-images.ubuntu.com/utopic/current/utopic-server-cloudimg-amd64-disk1.img")
+      
+    print('add ubuntu 14.10 image')
+    osutils.run_std("glance add name=Ubuntu-14.10 is_public=true container_format=ovf disk_format=qcow2 < utopic-server-cloudimg-amd64-disk1.img")
 
 
 
